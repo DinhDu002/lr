@@ -262,7 +262,7 @@ Built on Solidity contracts; superseded on 2026-10-29 by ADR 0006–0008. Step 2
 - [x] `crates/core`: transfers with a memo, key rotation, the Block format with a state root, issuance with halvings and the tail reward, LWMA Retarget, fee and size rules, the RandomX v2 binding (v2.0.1 pinned) with the official vectors on x86 and ARM.
 - [x] `crates/node`: Block and transaction checks, a mempool with the fee auction and minimum relay fee, `redb` storage, pruning from Checkpoint snapshots, TCP P2P behind an interface, JSON-RPC (`jsonrpsee`), Checkpoint checks.
 - [x] The Mine: one per Land, switched on and off by the Land owner in the Land, CPU limit, fast or light mode by available memory, rewards to the Land owner's address; the effect everyone in the Land sees when it wins a Block. LR's standalone mine command (ADR 0015).
-- [ ] Services: the Checkpoint signer (the project owner's key, on a separate machine); the company's seed nodes, Public node and archive. Built (`deploy/compose.chain.yaml`, `deploy/compose.signer.yaml`, `docs/runbooks/public-world.md`); they run once the project owner deploys them.
+- [x] Services: the Checkpoint signer (the project owner's key, on a separate machine); the company's seed nodes, Public node and archive (`deploy/compose.chain.yaml`, `deploy/compose.signer.yaml`, `docs/runbooks/public-world.md`). Running on the test network since 2026-11-02: seed `seed.linkedrealms.com:9444`, Public node RPC `https://rpc.linkedrealms.com`, the signer on the project owner's machine.
 - [x] Shell: balance, send Gold with a memo, key rotation, prompts for payments a Land asks for. The rotation button stays out until an ADR says how the Hub and statements treat a rotated key (the step plan's Answer 6); rotation itself is in `crates/core` and the Node.
 - [x] Docker stack: Map server, Node (on by default, can be turned off) and Mine (off); self-hosting guide updated; Map server ↔ Node protocol specified.
 - [x] Dashboard rebuilt on the Public node and the Hub.
@@ -393,7 +393,7 @@ Also decided on 2026-10-29: Node.js 26 LTS; the repo is public from day one; all
 - [ ] Phase 2 – Own chain, open source and testing
   - [x] 2A – Self-hosting, wallet and dashboard (EVM design)
   - [ ] 2B – World without the chain
-  - [ ] 2C – The chain (plan approved on 2026-10-30: `docs/plans/phase-2c-the-chain.md`; items 1 to 27 of 29 built, but for item 27's check with three Players on three machines, which needs the project owner; ends with the repository split and the main network launch)
+  - [ ] 2C – The chain (plan approved on 2026-10-30: `docs/plans/phase-2c-the-chain.md`; items 1 to 27 of 29 built and the test network's services running, but for item 27's check with three Players on three machines, which needs the project owner and a Hub this repository's Shell can use; ends with the repository split and the main network launch)
   - [ ] 2D – Economy in the reference Land kit
   - [ ] 2E – NPCs
   - [ ] 2F – Audit (after the genesis)
@@ -402,6 +402,11 @@ Also decided on 2026-10-29: Node.js 26 LTS; the repo is public from day one; all
 
 <!-- Claude Code records the date and the completed work here, newest first. -->
 
+- 2026-11-02: The test network's services are running, deployed at the project owner's request.
+  - The seed, the Public node and the archive run on the shared develop server as the compose project `linked-realms-chain`. The seed is `seed.linkedrealms.com:9444`, and the Public node's RPC is `https://rpc.linkedrealms.com`, behind the server's Caddy. They report network id 3, height 0 and genesis `daf7fc1c…`.
+  - The `lr-node` image there is the Dockerfile's `lr-node` stage built from the binary in CI's image `sha-9c230a4`, so nothing was compiled on the shared server.
+  - The Checkpoint signer runs on the project owner's machine, as the compose project `lr-test-signer`, and is connected to the seed. No Mine is on yet, so no Block and no Checkpoint exist.
+  - The same day, `hub.linkedrealms.com` began serving a separate Hub service with its own protocol, which this repository's Shell and Map servers do not speak. Only the chain was deployed: the three-Player check (runbook section 8) waits for the project owner to choose the Hub the game uses.
 - 2026-11-02: ADR 0016 on branch `phase-2/2c-lr-names`: the project owner settled the game terms in LR's paths.
   - Key derivation takes its salt and info as parameters; Linked Realms' labels moved to `packages/shared` (`characterKey`), with every key and address unchanged.
   - The signing contexts are `lr/tx/v1` and `lr/checkpoint/v1`. The test network was therefore reset under ADR 0012 decision 6: id 3, genesis 2026-11-02 00:00 UTC.
