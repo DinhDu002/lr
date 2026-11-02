@@ -506,7 +506,7 @@ mod tests {
         assert_eq!(check(repeated), Err(Error::SnapshotOrder));
     }
 
-    /// `cargo test --release -p linked-realms-core -- --ignored --nocapture full_block`
+    /// `cargo test --release -p lr-core -- --ignored --nocapture full_block`
     #[test]
     #[ignore = "a measurement, run in release"]
     fn full_block() {

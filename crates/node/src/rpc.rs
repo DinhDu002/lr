@@ -24,12 +24,12 @@ use jsonrpsee::server::{
     stop_channel,
 };
 use jsonrpsee::types::{ErrorObject, ErrorObjectOwned, Id};
-use linked_realms_core::Address;
-use linked_realms_core::block::{Block, Header};
-use linked_realms_core::checkpoint::Checkpoint;
-use linked_realms_core::params::ChainParams;
-use linked_realms_core::state::Account;
-use linked_realms_core::tx::{Kind, Tx};
+use lr_core::Address;
+use lr_core::block::{Block, Header};
+use lr_core::checkpoint::Checkpoint;
+use lr_core::params::ChainParams;
+use lr_core::state::Account;
+use lr_core::tx::{Kind, Tx};
 use serde::Deserialize;
 use serde_json::{Value, json};
 use tokio::runtime::Runtime;

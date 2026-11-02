@@ -14,7 +14,7 @@ export {
   transactionId,
   verify,
   wordsFromEntropy,
-} from "../pkg/linked_realms_core.js";
+} from "../pkg/lr_core.js";
 
 /** Scheme id of ML-DSA-44 in addresses. */
 export const SCHEME_ML_DSA_44 = 1;

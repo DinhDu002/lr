@@ -20,8 +20,8 @@ use jsonrpsee::server::{
     ServerConfig, ServerHandle, SubscriptionMessage, serve_with_graceful_shutdown, stop_channel,
 };
 use jsonrpsee::types::{ErrorObject, ErrorObjectOwned};
-use linked_realms_core::Address;
-use linked_realms_core::issuance::reward;
+use lr_core::Address;
+use lr_core::issuance::reward;
 use serde::Deserialize;
 use serde_json::{Value, json};
 use tokio::io::{AsyncRead, AsyncWrite};
@@ -33,8 +33,8 @@ use crate::Chain;
 use crate::mine::{self, Memory, Mine, Mode, Refused, State, Status};
 use crate::run::Running;
 
-/// The id of a Node's one Mine (one per Land in Linked Realms).
-pub const MINE_ID: &str = "land";
+/// The id of a Node's one Mine.
+pub const MINE_ID: &str = "default";
 /// A shared secret's bytes, at least.
 pub const MIN_SECRET: usize = 32;
 /// A subscriber hears of a change of the Mine's status at most this often.

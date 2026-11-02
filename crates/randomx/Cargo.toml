@@ -1,5 +1,5 @@
 [package]
-name = "linked-realms-randomx"
+name = "lr-randomx"
 version = "0.1.0"
 description = "RandomX v2, LR's Proof of Work: the reference implementation, vendored, behind a safe binding"
 edition.workspace = true

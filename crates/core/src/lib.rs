@@ -44,8 +44,6 @@ pub const ENTROPY_LEN: usize = 32;
 /// Seed `xi` of ML-DSA key generation.
 pub const SEED_LEN: usize = 32;
 
-const DERIVATION_SALT: &[u8] = b"linked-realms/ml-dsa-44/v1";
-
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Error {
     /// Not 24 English BIP-39 words with a valid checksum.
@@ -174,15 +172,19 @@ pub fn entropy_from_words(words: &str) -> Result<Zeroizing<[u8; ENTROPY_LEN]>, E
     Ok(entropy)
 }
 
-/// The ML-DSA-44 seed `xi` of Character `index` behind `entropy`: the BIP-39 seed with an empty
-/// passphrase, then HKDF-SHA512 (identity.md, "Keys").
-pub fn character_seed(entropy: &[u8; ENTROPY_LEN], index: u32) -> Zeroizing<[u8; SEED_LEN]> {
+/// The ML-DSA-44 seed `xi` of one key behind `entropy`: the BIP-39 seed with an empty passphrase,
+/// then HKDF-SHA512 with the `salt` and `info` the application chose (identity.md, "Keys").
+pub fn derive_seed(
+    entropy: &[u8; ENTROPY_LEN],
+    salt: &[u8],
+    info: &[u8],
+) -> Zeroizing<[u8; SEED_LEN]> {
     let words = Mnemonic::from_entropy_in(Language::English, entropy)
         .expect("32 bytes is a valid BIP-39 entropy length");
     let bip39_seed = Zeroizing::new(words.to_seed_normalized(""));
     let mut xi = Zeroizing::new([0u8; SEED_LEN]);
-    Hkdf::<Sha512>::new(Some(DERIVATION_SALT), bip39_seed.as_slice())
-        .expand(format!("character/{index}").as_bytes(), xi.as_mut_slice())
+    Hkdf::<Sha512>::new(Some(salt), bip39_seed.as_slice())
+        .expand(info, xi.as_mut_slice())
         .expect("32 bytes is a valid HKDF-SHA512 output length");
     xi
 }
@@ -376,10 +378,12 @@ mod tests {
     }
 
     #[test]
-    fn characters_differ_by_index() {
+    fn seeds_differ_by_salt_and_info() {
         let entropy = [1u8; ENTROPY_LEN];
-        assert_ne!(*character_seed(&entropy, 0), *character_seed(&entropy, 1));
-        assert_eq!(*character_seed(&entropy, 0), *character_seed(&entropy, 0));
+        let seed = |salt: &[u8], info: &[u8]| *derive_seed(&entropy, salt, info);
+        assert_ne!(seed(b"s", b"0"), seed(b"s", b"1"));
+        assert_ne!(seed(b"s", b"0"), seed(b"t", b"0"));
+        assert_eq!(seed(b"s", b"0"), seed(b"s", b"0"));
     }
 
     #[test]

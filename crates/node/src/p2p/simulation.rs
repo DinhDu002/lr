@@ -3,9 +3,9 @@
 //! branch with more work that forks below the last Checkpoint. Proof of Work is faked: the
 //! nonce alone passes, and a Block's solvetime is drawn as the Retarget simulation draws it.
 
-use linked_realms_core::params::DEV;
-use linked_realms_core::retarget::next_target;
-use linked_realms_core::u256::U256;
+use lr_core::params::DEV;
+use lr_core::retarget::next_target;
+use lr_core::u256::U256;
 
 use super::tests::Mesh;
 use super::*;

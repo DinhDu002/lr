@@ -10,7 +10,7 @@ use crate::{
 
 pub const TX_VERSION: u8 = 1;
 /// The ML-DSA context of every transaction signature. The kind is inside the signed bytes.
-pub const TX_CONTEXT: &[u8] = b"linked-realms/tx/v1";
+pub const TX_CONTEXT: &[u8] = b"lr/tx/v1";
 pub const MAX_MEMO_LEN: usize = 80;
 
 const KIND_TRANSFER: u8 = 0;
@@ -330,7 +330,7 @@ mod tests {
         tx.sign(&TESTNET, &a, &[9; 32]).unwrap();
         assert_ne!(tx.signature, first);
         assert_eq!(tx.id(&TESTNET), id);
-        assert_eq!(tx.signing_bytes(&TESTNET)[..4], [0, 0, 0, 1]);
+        assert_eq!(tx.signing_bytes(&TESTNET)[..4], [0, 0, 0, 3]);
     }
 
     #[test]

@@ -4,7 +4,7 @@ use std::net::TcpStream;
 use std::os::unix::net::UnixStream;
 use std::time::{SystemTime, UNIX_EPOCH};
 
-use linked_realms_core::params::DEV;
+use lr_core::params::DEV;
 
 use super::*;
 use crate::chain::tests::{Builder, File, submit_all};
@@ -162,8 +162,11 @@ fn the_control_socket_serves_the_node_and_its_mine() {
             .as_u64()
             .is_some_and(|mib| mib > 0)
     );
-    let land = json!({ "id": "land" });
-    assert_eq!(call("mine_status", land.clone())["result"]["state"], "off");
+    let mine_id = json!({ "id": "default" });
+    assert_eq!(
+        call("mine_status", mine_id.clone())["result"]["state"],
+        "off"
+    );
 
     // Each refusal, with its reason.
     let address = key(1).address().to_string();
@@ -174,12 +177,15 @@ fn the_control_socket_serves_the_node_and_its_mine() {
     let reason = |text: &str| (json!(-32602), json!(text));
     assert_eq!(refused(start("other", &address, 1)), reason("unknown-mine"));
     assert_eq!(
-        refused(start("land", "lr1nothing", 1)),
+        refused(start("default", "lr1nothing", 1)),
         reason("bad-address")
     );
-    assert_eq!(refused(start("land", &address, 0)), reason("bad-threads"));
     assert_eq!(
-        refused(start("land", &address, cap + 1)),
+        refused(start("default", &address, 0)),
+        reason("bad-threads")
+    );
+    assert_eq!(
+        refused(start("default", &address, cap + 1)),
         reason("bad-threads")
     );
     let other = call("mine_status", json!({ "id": "other" }));
@@ -189,14 +195,14 @@ fn the_control_socket_serves_the_node_and_its_mine() {
     // A subscriber hears the Mine start, and the Block it won once the Node took it.
     let mut ws = Ws::connect(UnixStream::connect(&path).unwrap(), "").unwrap();
     let subscribe =
-        json!({ "jsonrpc": "2.0", "id": 1, "method": "mine_subscribe", "params": land });
+        json!({ "jsonrpc": "2.0", "id": 1, "method": "mine_subscribe", "params": mine_id });
     ws.send(&subscribe);
     let subscription = ws.next()["result"].clone();
     let first = ws.next();
     assert_eq!(first["method"], "mine_status");
     assert_eq!(first["params"]["subscription"], subscription);
     assert_eq!(first["params"]["result"]["state"], "off");
-    let started = call("mine_start", start("land", &address, cap))["result"].clone();
+    let started = call("mine_start", start("default", &address, cap))["result"].clone();
     assert_eq!(started["state"], "starting");
     assert_eq!(started["rewardAddress"], json!(address));
     let (mut states, mut found, mut told) = (Vec::new(), None, HashSet::new());
@@ -221,7 +227,7 @@ fn the_control_socket_serves_the_node_and_its_mine() {
     let header = (running.call_blocking(move |node, _| node.chain.header(&id).unwrap())).unwrap();
     let header = header.unwrap();
     let expected = json!({
-        "id": "land",
+        "id": "default",
         "height": header.height,
         "hash": hex::encode(id),
         "reward": reward(header.height).to_string(),
@@ -231,7 +237,7 @@ fn the_control_socket_serves_the_node_and_its_mine() {
     assert_eq!(found, expected);
     assert!(mine.won(&id));
 
-    let stopped = call("mine_stop", land)["result"].clone();
+    let stopped = call("mine_stop", mine_id)["result"].clone();
     assert_eq!(
         (&stopped["state"], &stopped["threads"]),
         (&json!("off"), &json!(0))
@@ -281,7 +287,10 @@ fn a_node_that_stopped_cannot_start_its_mine() {
     let unavailable = (json!(-32002), json!("node-unavailable"));
     assert_eq!(call("node_info", json!([])), unavailable);
     let address = key(1).address().to_string();
-    assert_eq!(call("mine_start", start("land", &address, 1)), unavailable);
+    assert_eq!(
+        call("mine_start", start("default", &address, 1)),
+        unavailable
+    );
     assert_eq!(mine.status().state, State::Off);
 }
 
@@ -353,7 +362,7 @@ fn a_node_still_catching_up_cannot_start_its_mine() {
         json!(false)
     );
     let address = key(1).address().to_string();
-    let refused = call("mine_start", start("land", &address, 1));
+    let refused = call("mine_start", start("default", &address, 1));
     assert_eq!(
         (&refused["error"]["code"], &refused["error"]["message"]),
         (&json!(-32002), &json!("node-unavailable"))
@@ -382,7 +391,7 @@ fn a_tcp_control_listener_checks_the_secret_on_every_request() {
     let address = control.local_addr().unwrap();
     let call = |headers: &str| {
         let stream = TcpStream::connect(address).unwrap();
-        post(stream, headers, "mine_status", json!({ "id": "land" }))
+        post(stream, headers, "mine_status", json!({ "id": "default" }))
     };
     let bearer = |secret: &[u8]| format!("Authorization: Bearer {}\r\n", hex::encode(secret));
     assert_eq!(call("").0, 401);
@@ -396,7 +405,7 @@ fn a_tcp_control_listener_checks_the_secret_on_every_request() {
     let head = ws("").err().unwrap();
     assert!(head.starts_with("HTTP/1.1 401"), "{head}");
     let mut ws = ws(&bearer(&secret)).unwrap();
-    let subscribe = json!({ "jsonrpc": "2.0", "id": 1, "method": "mine_subscribe", "params": { "id": "land" } });
+    let subscribe = json!({ "jsonrpc": "2.0", "id": 1, "method": "mine_subscribe", "params": { "id": "default" } });
     ws.send(&subscribe);
     let subscription = ws.next()["result"].clone();
     let first = ws.next();
@@ -420,7 +429,7 @@ fn a_tcp_control_listener_bounds_the_connections_without_the_secret() {
     let bearer = format!("Authorization: Bearer {}\r\n", hex::encode(&secret));
     // One request on a connection kept open: its status code.
     let ask = |mut stream: &TcpStream| -> u16 {
-        let body = json!({ "jsonrpc": "2.0", "id": 1, "method": "mine_status", "params": { "id": "land" } });
+        let body = json!({ "jsonrpc": "2.0", "id": 1, "method": "mine_status", "params": { "id": "default" } });
         let body = body.to_string();
         write!(
             stream,
@@ -489,7 +498,7 @@ fn a_block_found_is_told_with_its_reward_and_its_fees() {
     submit_all(&chain, &[first, second.clone()]);
     let id = second.header.id();
     let expected = json!({
-        "id": "land",
+        "id": "default",
         "height": 2,
         "hash": hex::encode(id),
         "reward": (reward(2) + fee).to_string(),

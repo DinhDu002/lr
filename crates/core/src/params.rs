@@ -59,14 +59,17 @@ const MAX_TARGET: U256 = U256::ones(240);
 
 /// 2026-10-30 00:00:00 UTC.
 const GENESIS_TIMESTAMP: u64 = 1_793_318_400;
+/// 2026-11-02 00:00:00 UTC, the test network's reset for ADR 0016.
+const TESTNET_GENESIS_TIMESTAMP: u64 = 1_793_577_600;
 
 /// The public test network. `retarget_window` was set by the simulation of plan item 6
 /// (`tests/retarget_simulation.rs`). `initial_target` is the maximum, easier than the project
 /// owner's M5 mining on every thread in fast mode (ADR 0012). The project owner holds the
-/// Checkpoint signer's key (ADR 0015).
+/// Checkpoint signer's key (ADR 0015). Reset for ADR 0016's contexts with a new id and genesis
+/// timestamp (ADR 0012); id 1 is retired.
 pub const TESTNET: ChainParams = ChainParams {
-    network_id: 1,
-    genesis_timestamp: GENESIS_TIMESTAMP,
+    network_id: 3,
+    genesis_timestamp: TESTNET_GENESIS_TIMESTAMP,
     max_target: MAX_TARGET,
     initial_target: MAX_TARGET,
     block_time: 60,
@@ -142,10 +145,12 @@ mod tests {
 
     #[test]
     fn a_network_is_found_by_its_id() {
-        assert_eq!(by_network_id(1), Some(&TESTNET));
+        assert_eq!(by_network_id(3), Some(&TESTNET));
         assert_eq!(by_network_id(2), Some(&DEV));
         assert_eq!(by_network_id(0), None);
-        assert_eq!(by_network_id(3), None);
+        // The test network before its reset for ADR 0016.
+        assert_eq!(by_network_id(1), None);
+        assert_eq!(by_network_id(4), None);
     }
 
     #[test]

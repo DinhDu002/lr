@@ -1,13 +1,13 @@
 use std::collections::HashMap;
 use std::path::PathBuf;
 
-use linked_realms_core::block::{NONCE_OFFSET, check_genesis};
-use linked_realms_core::issuance::reward;
-use linked_realms_core::merkle::tx_root;
-use linked_realms_core::params::{DEV, DEV_CHECKPOINT_SEED, TESTNET};
-use linked_realms_core::smt::Node;
-use linked_realms_core::tx::{Kind, Tx, apply_tx};
-use linked_realms_core::{ADDRESS_LEN, SCHEME_ML_DSA_44, SigningKey};
+use lr_core::block::{NONCE_OFFSET, check_genesis};
+use lr_core::issuance::reward;
+use lr_core::merkle::tx_root;
+use lr_core::params::{DEV, DEV_CHECKPOINT_SEED, TESTNET};
+use lr_core::smt::Node;
+use lr_core::tx::{Kind, Tx, apply_tx};
+use lr_core::{ADDRESS_LEN, SCHEME_ML_DSA_44, SigningKey};
 
 use super::*;
 
@@ -933,7 +933,7 @@ fn a_move_never_undoes_a_pruned_block() {
     assert_eq!(chain.tip().unwrap(), a[5].header);
 }
 
-/// `cargo test --release -p linked-realms-node -- --ignored --nocapture bytes_per_account`
+/// `cargo test --release -p lr-node -- --ignored --nocapture bytes_per_account`
 #[test]
 #[ignore = "a measurement, run in release"]
 fn bytes_per_account() {

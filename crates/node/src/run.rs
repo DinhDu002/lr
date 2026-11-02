@@ -7,7 +7,7 @@ use std::sync::{Arc, Mutex};
 use std::thread::{self, JoinHandle};
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
-use linked_realms_core::block::{Block, Header};
+use lr_core::block::{Block, Header};
 use tokio::sync::{broadcast, oneshot};
 
 use crate::Error;

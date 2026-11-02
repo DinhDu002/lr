@@ -7,7 +7,7 @@ use crate::params::ChainParams;
 use crate::{Error, SCHEME_ML_DSA_44, SIGNATURE_LEN, SigningKey, verify};
 
 /// The context of every Checkpoint signature, so none passes for another kind of signature.
-pub const CHECKPOINT_CONTEXT: &[u8] = b"linked-realms/checkpoint/v1";
+pub const CHECKPOINT_CONTEXT: &[u8] = b"lr/checkpoint/v1";
 /// Checkpoints name Blocks at heights that are multiples of this.
 pub const CHECKPOINT_INTERVAL: u64 = 10;
 

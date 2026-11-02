@@ -63,7 +63,8 @@ Each network fixes:
 | maximum Target | `2^240 - 1` | `2^246 - 1` |
 | initial Target | `2^240 - 1` | `2^246 - 1` |
 | Retarget | on | off |
-| genesis timestamp | 1,793,318,400 (2026-10-30 00:00 UTC) | the same |
+| network id | 3 (1 until the reset of ADR 0016) | 2 |
+| genesis timestamp | 1,793,577,600 (2026-11-02 00:00 UTC) | 1,793,318,400 (2026-10-30 00:00 UTC) |
 | Checkpoint signer key | the project owner's (`crates/core/keys/testnet-checkpoint.hex`) | from the published seed of 32 bytes `0x02` (`crates/core/keys/dev-checkpoint.hex`) |
 
 `N` and the clamps below were set by the simulation of plan item 6 (`crates/core/tests/retarget_simulation.rs`). The Targets come from plan item 9's measurement (ADR 0012): about 65,536 hashes a Block at the test network's easiest, which the project owner's M5 finds in about 13 seconds on every thread in fast mode, and about 1,024 on the dev network, where Blocks come in seconds on one thread without running ahead of the clock.
@@ -84,7 +85,7 @@ Solvetimes of exactly `T` give `weighted = k`, so equal Targets stay the same.
 
 ## Checkpoints
 
-Every 10 Blocks the Checkpoint signer signs a Block's id, and no Node takes a history that changes a Block a Checkpoint names (ADR 0006 point 9, ADR 0015). The signer signs, with ML-DSA-44 under the context `linked-realms/checkpoint/v1`, these 44 bytes:
+Every 10 Blocks the Checkpoint signer signs a Block's id, and no Node takes a history that changes a Block a Checkpoint names (ADR 0006 point 9, ADR 0015). The signer signs, with ML-DSA-44 under the context `lr/checkpoint/v1`, these 44 bytes:
 
 | Field | Bytes |
 |---|---|

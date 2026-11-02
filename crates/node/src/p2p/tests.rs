@@ -3,12 +3,12 @@ use std::sync::atomic::{AtomicBool, Ordering};
 use std::thread;
 use std::time::{Duration, Instant};
 
-use linked_realms_core::checkpoint::Checkpoint;
-use linked_realms_core::issuance::BASE_UNITS_PER_GOLD as GOLD;
-use linked_realms_core::keccak256;
-use linked_realms_core::params::{DEV_CHECKPOINT_SEED, TESTNET};
-use linked_realms_core::state::{Account, PublicKey};
-use linked_realms_core::{ADDRESS_LEN, SCHEME_ML_DSA_44, SigningKey};
+use lr_core::checkpoint::Checkpoint;
+use lr_core::issuance::BASE_UNITS_PER_GOLD as GOLD;
+use lr_core::keccak256;
+use lr_core::params::{DEV_CHECKPOINT_SEED, TESTNET};
+use lr_core::state::{Account, PublicKey};
+use lr_core::{ADDRESS_LEN, SCHEME_ML_DSA_44, SigningKey};
 
 use super::*;
 use crate::Policy;
@@ -319,7 +319,7 @@ fn every_message_reads_back_and_a_bad_frame_does_not() {
                         balance: 5,
                         nonce: 1,
                         key: Some(PublicKey {
-                            scheme: linked_realms_core::SCHEME_ML_DSA_44,
+                            scheme: lr_core::SCHEME_ML_DSA_44,
                             bytes: key(1).public_key().to_vec(),
                         }),
                     },
@@ -929,7 +929,7 @@ fn a_bad_state_snapshot_bans_its_sender_and_changes_nothing() {
             })
             .collect()
     };
-    let part = |accounts: Vec<(linked_realms_core::Address, Account)>, more: bool| {
+    let part = |accounts: Vec<(lr_core::Address, Account)>, more: bool| {
         frame(&Message::StateSnapshot {
             height: 20,
             accounts,

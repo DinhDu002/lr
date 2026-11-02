@@ -4,7 +4,7 @@ use std::net::TcpStream;
 use jsonrpsee_core::client::{ClientT, Error as ClientError, Subscription, SubscriptionClientT};
 use jsonrpsee_core::rpc_params;
 use jsonrpsee_ws_client::WsClientBuilder;
-use linked_realms_core::issuance::BASE_UNITS_PER_GOLD as GOLD;
+use lr_core::issuance::BASE_UNITS_PER_GOLD as GOLD;
 
 use super::*;
 use crate::chain::tests::{Builder, File, PARAMS, Test, checkpoint, ledger, nobody, submit_all};

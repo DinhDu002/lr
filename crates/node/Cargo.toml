@@ -1,5 +1,5 @@
 [package]
-name = "linked-realms-node"
+name = "lr-node"
 version = "0.1.0"
 description = "The LR Node: stores the chain and follows its best branch"
 edition.workspace = true
@@ -12,8 +12,8 @@ name = "lr-node"
 path = "src/main.rs"
 
 [dependencies]
-linked-realms-core = { path = "../core" }
-linked-realms-randomx = { path = "../randomx" }
+lr-core = { path = "../core" }
+lr-randomx = { path = "../randomx" }
 # Pinned: the database file's format is redb's.
 redb = "=4.4.0"
 hex = "0.4.3"

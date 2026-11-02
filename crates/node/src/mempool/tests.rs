@@ -1,5 +1,5 @@
-use linked_realms_core::issuance::BASE_UNITS_PER_GOLD as GOLD;
-use linked_realms_core::{SCHEME_ML_DSA_44, SigningKey};
+use lr_core::issuance::BASE_UNITS_PER_GOLD as GOLD;
+use lr_core::{SCHEME_ML_DSA_44, SigningKey};
 
 use super::*;
 use crate::chain::tests::{Builder, File, PARAMS, Test, balance, nobody, submit_all};
@@ -280,7 +280,7 @@ fn a_refused_replacement_leaves_the_mempool_as_it_was() {
 fn a_template_passes_every_check_but_the_proof_of_work() {
     let (_file, chain, ..) = funded("checks", 0, Policy::default());
     let f = funder().address();
-    let too_late = linked_realms_core::block::MAX_TIMESTAMP + 1;
+    let too_late = lr_core::block::MAX_TIMESTAMP + 1;
     assert!(matches!(
         chain.template(f, Vec::new(), too_late),
         Err(Error::Rule(RuleError::TimestampTooLate))

@@ -11,12 +11,12 @@ use std::collections::{HashMap, HashSet, VecDeque};
 use std::hash::{BuildHasher, Hasher};
 use std::net::{IpAddr, SocketAddr};
 
-use linked_realms_core::block::{Block, Header, MAX_NEW_ACCOUNTS};
-use linked_realms_core::checkpoint::Checkpoint;
-use linked_realms_core::params::ChainParams;
-use linked_realms_core::state::{Account, tree_key};
-use linked_realms_core::tx::Tx;
-use linked_realms_core::{Address, Error as RuleError};
+use lr_core::block::{Block, Header, MAX_NEW_ACCOUNTS};
+use lr_core::checkpoint::Checkpoint;
+use lr_core::params::ChainParams;
+use lr_core::state::{Account, tree_key};
+use lr_core::tx::Tx;
+use lr_core::{Address, Error as RuleError};
 
 pub use message::{
     IN_FLIGHT, MAX_HEADERS, MAX_IDS, MAX_NODES, MAX_PAYLOAD, MAX_SNAPSHOT_ACCOUNTS, Malformed,

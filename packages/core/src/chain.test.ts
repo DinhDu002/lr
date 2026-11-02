@@ -106,17 +106,18 @@ describe("transactions", () => {
         true,
         rnd,
       );
-    expect(sign(1, new Uint8Array(80)).length).toBe(2517 + 80 + 1312);
-    expect(() => sign(1, new Uint8Array(81))).toThrow(
+    expect(sign(3, new Uint8Array(80)).length).toBe(2517 + 80 + 1312);
+    expect(() => sign(3, new Uint8Array(81))).toThrow(
       "memo longer than 80 bytes",
     );
-    expect(() => sign(3, new Uint8Array())).toThrow("unknown network id");
-    expect(() => sign(1, new Uint8Array(), new Uint8Array(31))).toThrow(
+    // Network 1 is the test network before its reset (ADR 0016).
+    expect(() => sign(1, new Uint8Array())).toThrow("unknown network id");
+    expect(() => sign(3, new Uint8Array(), new Uint8Array(31))).toThrow(
       "expected 32 bytes",
     );
     expect(() =>
       key.signTransfer(
-        1,
+        3,
         key.address,
         0n,
         0n,
@@ -129,7 +130,7 @@ describe("transactions", () => {
     ).toThrow("not a valid address");
     const rotate = (scheme: number, length: number) =>
       key.signRotation(
-        1,
+        3,
         key.address,
         0n,
         0n,
@@ -143,7 +144,7 @@ describe("transactions", () => {
     expect(() => rotate(2, 1312)).toThrow("unknown signature scheme");
   });
 
-  // wasm-bindgen would take them modulo 2^bits: -1n as the nonce 2^64 - 1, 2^32 + 1 as network 1.
+  // wasm-bindgen would take them modulo 2^bits: -1n as the nonce 2^64 - 1, 2^32 + 3 as network 3.
   it("refuses integers out of range instead of wrapping them", () => {
     using key = Key.fromSeed(zeros);
     const memo = new Uint8Array();
@@ -159,10 +160,10 @@ describe("transactions", () => {
         true,
         zeros,
       );
-    expect(sign(1, 2n ** 64n - 1n, 2n ** 64n - 1n, 2n ** 64n - 1n).length).toBe(
+    expect(sign(3, 2n ** 64n - 1n, 2n ** 64n - 1n, 2n ** 64n - 1n).length).toBe(
       3829,
     );
-    for (const network of [2 ** 32 + 1, -1, 1.5, NaN, Infinity]) {
+    for (const network of [2 ** 32 + 3, -1, 1.5, NaN, Infinity]) {
       expect(() => sign(network, 0n)).toThrow(
         "networkId is not an integer in range",
       );
@@ -171,16 +172,16 @@ describe("transactions", () => {
       );
     }
     for (const out of [-1n, 2n ** 64n]) {
-      expect(() => sign(1, out)).toThrow(
+      expect(() => sign(3, out)).toThrow(
         "nonce is not a bigint from 0 to 2^64 - 1",
       );
-      expect(() => sign(1, 0n, out)).toThrow("fee is not a bigint");
-      expect(() => sign(1, 0n, 0n, out)).toThrow("amount is not a bigint");
+      expect(() => sign(3, 0n, out)).toThrow("fee is not a bigint");
+      expect(() => sign(3, 0n, 0n, out)).toThrow("amount is not a bigint");
       expect(() => formatAmount(out)).toThrow("units is not a bigint");
     }
     expect(() =>
       key.signRotation(
-        1,
+        3,
         key.address,
         0n,
         0n,

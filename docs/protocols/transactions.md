@@ -28,8 +28,8 @@ Sizes for scheme 1: a transfer is 2,517 bytes plus the memo, and 1,312 more on t
 
 ## Signed bytes, signature and id
 
-- **Signed bytes:** the network id (4 bytes: `1` on the test network, `2` on the dev network), then every field above except the signature. The network id is not in the transaction; the Node and the Shell take it from the network they are on.
-- **Signature:** ML-DSA over the signed bytes, with the context `linked-realms/tx/v1`, by the key the sender's account holds, or the key in the transaction on the first one. A signature made for one network does not verify on another.
+- **Signed bytes:** the network id (4 bytes: `3` on the test network, `2` on the dev network), then every field above except the signature. The network id is not in the transaction; the Node and the Shell take it from the network they are on.
+- **Signature:** ML-DSA over the signed bytes, with the context `lr/tx/v1`, by the key the sender's account holds, or the key in the transaction on the first one. A signature made for one network does not verify on another.
 - **Id:** `keccak256(signed bytes)`. A new signature of the same transaction keeps its id.
 
 ## Amounts as people write them
