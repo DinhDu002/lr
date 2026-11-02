@@ -1,5 +1,5 @@
 //! Amounts as people read and type them (docs/protocols/transactions.md): GOLD with at most 8
-//! decimals, for the Shell and the Land UI. Transactions hold base units.
+//! decimals, for a wallet and other applications. Transactions hold base units.
 
 use crate::Error;
 use crate::issuance::BASE_UNITS_PER_GOLD;

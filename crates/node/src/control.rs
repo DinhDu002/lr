@@ -1,4 +1,4 @@
-//! The control listener of a Node (docs/plans/phase-2c-the-chain.md, "The Mine"): `node_info`
+//! The control listener of a Node (docs/protocols/node-control.md): `node_info`
 //! and the `mine_` methods, which only the Node's owner may call (P5). It listens on a Unix
 //! socket only its user can open, or on TCP with a shared secret checked on every request, and
 //! never on the public RPC's listener.

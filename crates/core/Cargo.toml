@@ -1,7 +1,7 @@
 [package]
 name = "lr-core"
 version = "0.1.0"
-description = "Chain rules, keys, signatures and addresses shared by the Node, the Mine and the Shell"
+description = "Chain rules, keys, signatures and addresses shared by the Node, the Mine and the wallet"
 edition.workspace = true
 license.workspace = true
 repository.workspace = true

@@ -457,7 +457,7 @@ fn now() -> u64 {
         .map_or(0, |since| since.as_secs())
 }
 
-/// Makes the calling thread yield to the Land and everything else on the machine.
+/// Makes the calling thread yield to the application and everything else on the machine.
 fn lower_priority() {
     // SAFETY: plain system calls on the calling thread, with no pointers.
     #[cfg(target_os = "linux")]

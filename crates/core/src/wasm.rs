@@ -42,7 +42,7 @@ pub struct Key(SigningKey);
 
 #[wasm_bindgen]
 impl Key {
-    /// A Map server key or the Hub's ticket key, from its stored 32-byte seed.
+    /// A key from its stored 32-byte seed, such as a server's.
     #[wasm_bindgen(js_name = fromSeed)]
     pub fn from_seed(xi: &[u8]) -> Result<Key, JsError> {
         Ok(Key(SigningKey::from_seed(array(xi)?)))

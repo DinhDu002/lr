@@ -22,7 +22,7 @@ jobs:
         with:
           node-version-file: .nvmrc
           cache: pnpm
-      # packages/core is the WASM build of crates/core (ADR 0009).
+      # packages/core is the WebAssembly build of crates/core (ADR 0009).
       - run: rustup toolchain install
       - name: Install wasm-bindgen-cli
         run: |
@@ -37,8 +37,7 @@ jobs:
       - run: pnpm typecheck
       - run: pnpm test
 
-  # In real browsers: the isolation half of step 2B's done-when (a hostile Land in the Shell's frame),
-  # and the Land owner's Mine switch.
+  # In real browsers: the wallet, against stubs of the Node.
   browser:
     runs-on: ubuntu-24.04
     steps:
@@ -48,7 +47,7 @@ jobs:
         with:
           node-version-file: .nvmrc
           cache: pnpm
-      # packages/core is the WASM build of crates/core (ADR 0009); the Shell is built on it.
+      # packages/core is the WebAssembly build of crates/core (ADR 0009); the wallet is built on it.
       - run: rustup toolchain install
       - name: Install wasm-bindgen-cli
         run: |
@@ -58,28 +57,9 @@ jobs:
         env:
           V: 0.2.129 # the wasm-bindgen version in crates/core/Cargo.toml
       - run: pnpm install --frozen-lockfile
-      - run: pnpm --filter @linked-realms/core build
-      - run: pnpm --filter @linked-realms/shell exec playwright install --with-deps chromium firefox
-      - run: pnpm --filter @linked-realms/shell test:browser
-      # The Land's Mine: the Land UI and its Map server, with a fake Node, in a stub Shell.
-      - run: pnpm --filter @linked-realms/client test:browser
-
-  # The reference kit's game protocol: lint the .proto and check the committed code is current.
-  buf:
-    runs-on: ubuntu-24.04
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      - uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
-      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
-        with:
-          node-version-file: .nvmrc
-          cache: pnpm
-      - run: pnpm install --frozen-lockfile
-      - run: pnpm --filter @linked-realms/shared proto
-      - name: Generated code in packages/shared/src/gen is current
-        run: |
-          git status --porcelain -- packages/shared/src/gen
-          test -z "$(git status --porcelain -- packages/shared/src/gen)"
+      - run: pnpm --filter @dinhdu002/lr-core build
+      - run: pnpm --filter @dinhdu002/lr-wallet exec playwright install --with-deps chromium firefox
+      - run: pnpm --filter @dinhdu002/lr-wallet test:browser
 
   # On both architectures the image is built for, so RandomX's vectors run natively on each.
   rust:
@@ -111,6 +91,5 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      # Build only: image.yml publishes the Map server image from main and the working branch.
-      - run: docker build -t linked-realms-node:ci .
-      - run: docker build --target shell -t linked-realms-shell:ci .
+      # Build only; rust above builds lr-node, and image.yml publishes it.
+      - run: docker build --target wallet .

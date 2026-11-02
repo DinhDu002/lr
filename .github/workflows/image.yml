@@ -1,14 +1,14 @@
-# Publishes the Map server image (the Dockerfile's default target) that the Shell's "Your Land"
-# command runs: ghcr.io/<owner>/linked-realms-node, for amd64 and arm64 (ADR 0010).
-# Tags: the branch name, the commit, and `latest` from the default branch. Step 2C's item branches
-# (phase-2/2c-*) build it too, so a change to the image is tried before it is merged.
+# Publishes the lr-node image (the Dockerfile's default target): ghcr.io/dinhdu002/lr-node, for amd64
+# and arm64. Tags: the branch name on main, the commit, `latest` from the default branch, and the
+# version on a tag `v*`.
 # The image holds lr-node, whose Rust and C++ would take hours under emulation, so each platform is
 # built on a runner of its own architecture and pushed by digest; the last job joins the two.
 name: image
 
 on:
   push:
-    branches: [main, phase-2/2b-world, "phase-2/2c-*"]
+    branches: [main]
+    tags: ["v*"]
 
 permissions:
   contents: read
@@ -19,7 +19,7 @@ concurrency:
 
 env:
   # GHCR names are lowercase.
-  IMAGE: ghcr.io/dinhdu002/linked-realms-node
+  IMAGE: ghcr.io/dinhdu002/lr-node
 
 jobs:
   platform:
@@ -90,6 +90,7 @@ jobs:
           tags: |
             type=ref,event=branch
             type=sha
+            type=semver,pattern={{version}}
             type=raw,value=latest,enable={{is_default_branch}}
       - working-directory: digests
         run: |

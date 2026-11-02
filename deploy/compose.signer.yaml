@@ -1,4 +1,4 @@
-# LR's Checkpoint signer (docs/runbooks/public-world.md, "7. The chain"), on the project owner's
+# LR's Checkpoint signer (docs/runbooks/lr-services.md, "3. The Checkpoint signer"), on the project owner's
 # own machine and never on the server of deploy/compose.chain.yaml: its key can rewrite deep
 # history (ADR 0015). The key is the 24 words in a file on this machine, mounted as a secret; it
 # is in no image. Nothing is published: the signer only dials the seed.

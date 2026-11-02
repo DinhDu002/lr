@@ -5,12 +5,15 @@
     "build": {
       "inputs": [
         "package.json",
+        "src/**",
+        "tsconfig.json",
+        "tsconfig.build.json",
         "$TURBO_ROOT$/crates/**",
         "$TURBO_ROOT$/Cargo.toml",
         "$TURBO_ROOT$/Cargo.lock",
         "$TURBO_ROOT$/rust-toolchain.toml"
       ],
-      "outputs": ["pkg/**"]
+      "outputs": ["pkg/**", "dist/**"]
     },
     "typecheck": { "dependsOn": ["build"] },
     "test": { "dependsOn": ["build"] }

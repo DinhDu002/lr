@@ -10,11 +10,6 @@ packages/core/pkg/
 .DS_Store
 .playwright-mcp/
 
-# Map server keys
-.data/
-
 # Playwright output
-packages/shell/test-results/
-packages/shell/playwright-report/
-packages/client/test-results/
-packages/client/playwright-report/
+packages/wallet/test-results/
+packages/wallet/playwright-report/

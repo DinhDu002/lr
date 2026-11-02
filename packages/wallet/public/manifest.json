@@ -1,0 +1,8 @@
+{
+  "name": "LR wallet",
+  "short_name": "LR wallet",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#15161a",
+  "theme_color": "#23252c"
+}

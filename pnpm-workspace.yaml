@@ -1,5 +1,2 @@
 packages:
   - packages/*
-allowBuilds:
-  # Its postinstall only swaps the JavaScript launcher for the platform binary; the launcher works.
-  "@bufbuild/buf": false

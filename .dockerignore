@@ -10,7 +10,7 @@ packages/core/pkg
 .env.*
 !.env.example
 docs
-# The public world's own settings, secrets included (deploy/.env).
+# The company's services' own settings, secrets included (deploy/.env).
 deploy
 **/*.md
 **/test-results
