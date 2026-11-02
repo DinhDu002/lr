@@ -1,6 +1,6 @@
 # 0016 — LR's names, and the game's labels out of LR's code
 
-Status: accepted, 2026-11-02 — by the project owner, who chose the recommended answer to each of four questions on the game terms that `CONTEXT-MAP.md` found in LR's paths. It changes ADR 0009 decision 2 (where the labels live, not their values), the Checkpoint context of ADR 0012 decision 7, and the transaction context of the step 2C plan, and it resets the test network under ADR 0012 decision 6.
+Status: accepted, 2026-11-02 — by the project owner, who chose the recommended answer to each of four questions on the game terms that `CONTEXT-MAP.md` ([at `pre-split`](https://github.com/DinhDu002/linked-realms/blob/pre-split/CONTEXT-MAP.md)) found in LR's paths. It changes ADR 0009 decision 2 (where the labels live, not their values), the Checkpoint context of ADR 0012 decision 7, and the transaction context of the step 2C plan, and it resets the test network under ADR 0012 decision 6. Decision 4 (the package name, and the Land image) is changed by ADR 0017.
 
 ## Context
 
@@ -10,7 +10,7 @@ LR moves to its own repository before the genesis (ADR 0015 decision 6), and Lin
 
 1. **LR derives a key from 24 words under a salt and an info that the application chooses.**
    - `crates/core` has `derive_seed(entropy, salt, info)`, and the WebAssembly `Key.fromEntropy(entropy, salt, info)`, in place of `character_seed(entropy, index)`.
-   - Linked Realms keeps its labels, `linked-realms/ml-dsa-44/v1` and `character/{index}`, in `packages/shared` (`characterKey`), which also checks the index.
+   - Linked Realms keeps its labels, `linked-realms/ml-dsa-44/v1` and `character/{index}`, in Linked Realms' `packages/shared` (`characterKey`), which also checks the index.
    - Every key and address stays the same.
    - Rejected: new neutral labels, which would change every Character's address; keeping the labels in LR.
 2. **The signing contexts are LR's: `lr/tx/v1` and `lr/checkpoint/v1`.**

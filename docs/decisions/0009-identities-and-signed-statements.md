@@ -1,6 +1,8 @@
 # 0009 — Identities, addresses and signed statements
 
-Status: accepted, 2026-10-29 — by the project owner, with the step 2B plan (`docs/plans/phase-2b-world-without-chain.md`). Decision 2 changed on 2026-11-02 by ADR 0016: the salt and info are Linked Realms' own and live in its code, not in LR's; their values are unchanged.
+Status: accepted, 2026-10-29 — by the project owner, with the step 2B plan (Linked Realms' `docs/plans/phase-2b-world-without-chain.md`, [at `pre-split`](https://github.com/DinhDu002/linked-realms/blob/pre-split/docs/plans/phase-2b-world-without-chain.md)). Decision 2 changed on 2026-11-02 by ADR 0016: the salt and info are Linked Realms' own and live in its code, not in LR's; their values are unchanged.
+
+ADRs 0001–0005, 0007, 0008, 0010 and 0014 named in this file are Linked Realms' (the game's repository, [`docs/decisions/` at `pre-split`](https://github.com/DinhDu002/linked-realms/tree/pre-split/docs/decisions)).
 
 ## Context
 
@@ -41,7 +43,7 @@ ADR 0006 chose ML-DSA-44 keys from 24 words, with a scheme id in every address a
 7. **Where the code lives.**
    - `crates/core` implements keys, signatures and addresses once (P9).
    - The Shell, `hub-api`, the relay and the reference Map server all use its WASM build.
-   - The statement grammar lives in `packages/shared`, because the chain does not use it.
+   - The statement grammar lives in Linked Realms' `packages/shared`, because the chain does not use it.
    - Rejected: Node's built-in ML-DSA in the TypeScript servers, which would be a second implementation of the address encoding.
 
 ## Consequences

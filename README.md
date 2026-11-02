@@ -1,77 +1,90 @@
-# linked-realms
+# LR
 
-A game made of many Lands. Each player hosts their own Land, and the Lands join into one shared world through the Hub, which only connects Lands and lets Characters travel between them. Gold is mined by Proof of Work on LR, the project's own chain, like Bitcoin. Players' keys stay in the Shell, and each Land makes its own rules.
+LR is a Proof-of-Work chain that holds money and nothing else. Its money is Gold (`GOLD`), kept in Accounts under rules that every Node checks for itself. Gold is created only as Block rewards, on a fixed schedule with no premine, and anyone can run a Mine for an address. Its first application is the game [Linked Realms](https://github.com/DinhDu002/linked-realms), which lives in its own repository.
 
-> **Status:** Phase 2, step 2C: the chain. LR's Node, the Mine, Gold in the Shell and the dashboard run in the local world below. Next comes the check with three Players on three machines, then LR moves to its own repository and the project owner launches the main network. **No network runs yet:** a test network serves step 2C's acceptance test, then the main network starts and is never reset (P7).
+> **Status:** the chain is built and runs on the test network. Next come release v0.1.0, a chain-only test (three people on three machines mine, send Gold to one another and see Checkpoints signed), and then the main network, which only the project owner launches and which is never reset. Details: [PLAN.md](PLAN.md) section 6 and [ADR 0017](docs/decisions/0017-lr-alone-the-game-moves-out.md).
 
-## Stage 1
+## The test network
 
-- Each Character owns at most one Land (64×64 tiles). The Hub gives every Land a cell, and Characters walk into neighbouring Lands through Gates.
-- Gold is mined by Proof of Work on LR, the project's own chain. Every Node checks every Block, and Gold is created only on a fixed schedule, with no premine.
-- A Player's key never leaves the Shell. A Land's UI runs in an isolated frame, and the Shell shows the Player every signature a Land asks for.
+Running since 2026-11-02, network id 3. It may be reset, and it stops once the main network starts. Test Gold is worth nothing.
 
-## Play
+| Service | Where |
+| --- | --- |
+| Seed Node | `seed.linkedrealms.com:9444` |
+| Public node (RPC, CORS `*`) | <https://rpc.linkedrealms.com> |
+| Archive | run by the company, no public address |
+| Checkpoint signer | the project owner's machine |
 
-The test world runs at <https://play.linkedrealms.com>. Open it, make a Character, and walk into the Lands in the Directory: with the arrow keys on a computer, or with the pad in the lower left on a phone or tablet. "Full screen" in the bar hides the browser around the game; on an iPhone, which has no full screen for pages, add the Shell to the Home Screen and open it from there. To host a Land of your own, install Docker on a computer (phones cannot run it) and run the one command the Shell shows under "Your Land" ([docs/self-hosting.md](docs/self-hosting.md)). For now this test world serves Lands 1 to 4.
+The services are run from [docs/runbooks/lr-services.md](docs/runbooks/lr-services.md).
+
+## Get an address and send Gold
+
+LR's web wallet keeps your key behind a password, shows your balance and sends Gold. Run it locally against the test network:
+
+```bash
+VITE_NODE_URL=https://rpc.linkedrealms.com VITE_NETWORK=test pnpm --filter @dinhdu002/lr-wallet dev
+```
+
+Or build it as a container: `docker build --target wallet --build-arg VITE_NODE_URL=https://rpc.linkedrealms.com --build-arg VITE_NETWORK=test -t lr-wallet .`, then run it and open its port. Create a new key, write down its 24 words (nobody can recover them for you), and copy your address: it starts with `tlr1` on the test network. See [packages/wallet/README.md](packages/wallet/README.md).
+
+## Run a Node and mine on the test network
+
+`lr-node` is the Node, and `lr-node mine` is a Node with a Mine for one address. A Mine runs only when you start it, on the threads you give it.
+
+```bash
+docker run -d --name lr-mine -v lr-data:/data ghcr.io/dinhdu002/lr-node:<version> \
+  mine --reward-address <your tlr1… address> --network test \
+  --seed seed.linkedrealms.com:9444 --threads 1 --mode light --data /data
+docker logs -f lr-mine
+docker stop lr-mine   # stops mining
+```
+
+- `<version>` is a release's version, such as `0.1.0`; the image is published from v0.1.0 on.
+- A new Node syncs the chain from the seed, checking every Block, before it can win Blocks. The chain is kept in the `lr-data` volume.
+- `--mode light` hashes over a 256 MiB cache and needs little memory. `--mode fast` hashes over a dataset of about 2 GiB, several times faster per thread, and needs that memory free. `--mode auto` (the default) takes fast when at least 2.5 GiB is available.
+- `--threads` is how many CPU threads mine (default 1). Mining is off at every start unless you run `mine`.
+- Block rewards and fees go to `--reward-address`; the Node holds no key.
+
+Other flags (`--listen`, `--rpc`, `--archive`, `--control`) are listed in the usage that `lr-node` prints for a flag it does not know (`crates/node/src/main.rs`); see also [docs/protocols/node-control.md](docs/protocols/node-control.md) and [docs/protocols/node-rpc.md](docs/protocols/node-rpc.md).
+
+## The package `@dinhdu002/lr-core`
+
+`packages/core` is the WebAssembly build of `crates/core`, published on GitHub Packages as `@dinhdu002/lr-core`: keys from 24 words, signing, addresses, amounts and transaction encoding, the same code the Node runs. `accountKey(entropy, index)` gives LR's wallet key; an application may derive its own keys under its own labels ([docs/protocols/identity.md](docs/protocols/identity.md)).
 
 ## Development
 
-Requirements: Node.js 26 (see `.nvmrc`), pnpm 11.3, Rust through `rustup` (the version is pinned in `rust-toolchain.toml`) with `wasm-bindgen-cli` 0.2.129, and Docker.
+Requirements: Node.js 26 (see `.nvmrc`), pnpm 11.3, Rust through `rustup` (the version is pinned in `rust-toolchain.toml`) with `wasm-bindgen-cli` 0.2.129, CMake and a C++ compiler (RandomX), and Docker.
 
 ```bash
 cargo install wasm-bindgen-cli --version 0.2.129 --locked
 pnpm install
 pnpm format:check && pnpm lint && pnpm typecheck && pnpm test   # builds packages/core (WebAssembly) first
 cargo fmt --check && cargo clippy --all-targets -- -D warnings && cargo test
-docker compose up -d   # PostgreSQL on 127.0.0.1:5432
+docker compose up -d                 # the dev network: a seed Node (RPC on 127.0.0.1:9445) and the wallet (http://127.0.0.1:8788)
+docker compose --profile mine up -d  # and a Mine on the dev network
+pnpm e2e:chain                       # the wallet's browser test against compose.yaml
 ```
 
-Copy `.env.example` to `.env` to change the local ports or credentials. The Shell's browser tests are `pnpm --filter @linked-realms/shell test:browser` (`packages/shell/README.md`).
+Copy `.env.example` to `.env` to change the local ports.
 
-## Run the world
+## Layout
 
-The `world` profile adds the Hub, the relay, the Shell, a seed Node of LR, the dashboard and two Map servers to PostgreSQL. Each Map server runs its own Node on LR's dev network, whose Blocks come in seconds. Run it as its own Compose project, so it never touches the state of a default stack:
-
-```bash
-POSTGRES_PORT=5433 docker compose -p linked-realms-world --profile world up -d --build
-pnpm e2e:world   # register both Lands, walk from Land 1 through a Gate into Land 2, stop and restart Land 1, switch its Mine on and off
-pnpm e2e:chain   # Land 1's Mine wins Gold, its owner sends some with a memo to the other Character, and a restart leaves the Mine off
-docker compose -p linked-realms-world --profile world down -v   # reset everything
-```
-
-| Service     | What it is                                                                                          | Host port               |
-| ----------- | --------------------------------------------------------------------------------------------------- | ----------------------- |
-| `postgres`  | The Hub's database                                                                                  | `POSTGRES_PORT` (5432)  |
-| `hub-api`   | Land registration, cells, the Directory, sign-in, names, Travel tickets, reports                    | `HUB_PORT` (8787)       |
-| `relay`     | Carries Players to Map servers that have no open port; Land `n` is `http://n.localhost:8080`        | `RELAY_PORT` (8080)     |
-| `shell`     | The Shell                                                                                           | `SHELL_PORT` (8788)     |
-| `seed`      | The Node every Land's Node dials first; its RPC is the Shell's Public node                          | `NODE_RPC_PORT` (9445)  |
-| `dashboard` | The world's figures: Lands online, Mines mining, Block time, hash rate, Block winners, new Accounts | `DASHBOARD_PORT` (8790) |
-| `map-1`     | Development Character 1's Map server and Node; its volume keeps the key and the chain; fast Mine    | none                    |
-| `map-2`     | Development Character 2's Map server and Node; light Mine, 1 thread                                 | none                    |
-
-With other ports or another project name, give `pnpm e2e:world` and `pnpm e2e:chain` the same `HUB_PORT` and `SHELL_PORT`, and the project as `WORLD_PROJECT`.
-
-To play by hand, open the Shell at <http://localhost:8788>, choose "Restore from 24 words" and enter a development Character's words. Under "Your Land", "Register" gives that Character its Land; within about 15 seconds the Land has a cell and is online in the Directory. A browser profile holds one Character, so use a second profile for the second Character. In its own Land, a Character's "Switch the Mine" starts its Mine after the Shell signs the switch; every visitor sees the Blocks it wins.
-
-| Development Character | Owns    | 24 words                                                                                                                                                                                  |
-| --------------------- | ------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 1                     | `map-1` | `absurd amount doctor acoustic avoid letter advice cage absurd amount doctor acoustic avoid letter advice cage absurd amount doctor acoustic avoid letter advice comic`                    |
-| 2                     | `map-2` | `acoustic avoid letter advice cage absurd amount doctor acoustic avoid letter advice cage absurd amount doctor acoustic avoid letter advice cage absurd amount exchange`                  |
-| Admin (`HUB_ADMINS`)  | —       | `adapt blossom school alcohol coral light army gather adapt blossom school alcohol coral light army gather adapt blossom school alcohol coral light army hold`                            |
-
-**All keys here are public development keys:** these Characters, the Hub's ticket key and session secret in `compose.yaml`. They exist for local development only; never reuse them anywhere else.
-
-To host a Land of your own against this world, follow [docs/self-hosting.md](docs/self-hosting.md) on the world's network: add `--network linked-realms-world_default` and use `HUB_URL=http://hub-api:8787`, `HUB_DOMAIN=localhost:8787` and `RELAY_URL=ws://relay:8080`.
+| Path | What it is |
+| --- | --- |
+| `crates/core` | Chain rules, encodings, hashing, ML-DSA keys, addresses; native and WebAssembly |
+| `crates/node` | `lr-node`: the Node, its RPC, the Mine and the Checkpoint signer |
+| `crates/randomx` | RandomX v2 behind a safe binding |
+| `packages/core` | `@dinhdu002/lr-core`, the WebAssembly package |
+| `packages/wallet` | `@dinhdu002/lr-wallet`, LR's web wallet |
+| `deploy/` | The company's services: `compose.chain.yaml`, `compose.signer.yaml` |
 
 ## Documents
 
 - [PLAN.md](PLAN.md): principles, architecture, rules, roadmap and progress.
-- [CONTEXT.md](CONTEXT.md): domain glossary.
+- [CONTEXT.md](CONTEXT.md): LR's glossary.
 - [docs/decisions/](docs/decisions/): architecture decision records.
-- [docs/protocols/](docs/protocols/): the protocols every Land, Shell and Hub follows.
-- [docs/self-hosting.md](docs/self-hosting.md): host your own Land with Docker.
-- [docs/runbooks/public-world.md](docs/runbooks/public-world.md): run a public world (Hub, relay and Shell).
+- [docs/protocols/](docs/protocols/): identity, transactions, blocks, the P2P protocol, the RPC and the Node's control listener.
+- [docs/runbooks/lr-services.md](docs/runbooks/lr-services.md): run the company's services.
 - [CONTRIBUTING.md](CONTRIBUTING.md): how changes get in.
 
 ## License
