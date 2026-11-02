@@ -4,12 +4,12 @@
 
 use std::net::{IpAddr, Ipv6Addr, SocketAddr};
 
-use linked_realms_core::block::{Block, HEADER_LEN, Header};
-use linked_realms_core::checkpoint::Checkpoint;
-use linked_realms_core::codec::Reader;
-use linked_realms_core::state::{Account, PublicKey};
-use linked_realms_core::tx::Tx;
-use linked_realms_core::{ADDRESS_LEN, Address, PUBLIC_KEY_LEN, keccak256};
+use lr_core::block::{Block, HEADER_LEN, Header};
+use lr_core::checkpoint::Checkpoint;
+use lr_core::codec::Reader;
+use lr_core::state::{Account, PublicKey};
+use lr_core::tx::Tx;
+use lr_core::{ADDRESS_LEN, Address, PUBLIC_KEY_LEN, keccak256};
 
 /// The largest payload: a Block of 1,000,000 bytes fits with room to spare.
 pub const MAX_PAYLOAD: usize = 2 * 1024 * 1024;
@@ -201,14 +201,13 @@ impl Message {
     /// commands, and they are skipped.
     fn read(command: u8, payload: &[u8]) -> Result<Option<Message>, Malformed> {
         let mut r = Reader::new(payload);
-        let ids =
-            |r: &mut Reader, max: usize| -> Result<Vec<[u8; 32]>, linked_realms_core::Error> {
-                let count = usize::from(r.u16()?);
-                if count > max {
-                    return Err(linked_realms_core::Error::Truncated);
-                }
-                (0..count).map(|_| r.array()).collect()
-            };
+        let ids = |r: &mut Reader, max: usize| -> Result<Vec<[u8; 32]>, lr_core::Error> {
+            let count = usize::from(r.u16()?);
+            if count > max {
+                return Err(lr_core::Error::Truncated);
+            }
+            (0..count).map(|_| r.array()).collect()
+        };
         let message = (|| {
             Ok(Some(match command {
                 0 => Message::Version(Version {
@@ -228,7 +227,7 @@ impl Message {
                 8 => {
                     let count = usize::from(r.u16()?);
                     if count > MAX_HEADERS {
-                        return Err(linked_realms_core::Error::Truncated);
+                        return Err(lr_core::Error::Truncated);
                     }
                     let headers = (0..count)
                         .map(|_| Header::from_bytes(r.bytes(HEADER_LEN)?))
@@ -247,7 +246,7 @@ impl Message {
                 14 => {
                     let count = usize::from(r.u16()?);
                     if count > MAX_NODES {
-                        return Err(linked_realms_core::Error::Truncated);
+                        return Err(lr_core::Error::Truncated);
                     }
                     let mut addresses = Vec::with_capacity(count);
                     for _ in 0..count {
@@ -268,7 +267,7 @@ impl Message {
                     let (height, more) = (r.u64()?, r.u8()?);
                     let count = usize::from(r.u16()?);
                     if more > 1 || count > MAX_SNAPSHOT_ACCOUNTS {
-                        return Err(linked_realms_core::Error::Truncated);
+                        return Err(lr_core::Error::Truncated);
                     }
                     let mut accounts = Vec::with_capacity(count);
                     for _ in 0..count {

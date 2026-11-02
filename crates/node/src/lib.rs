@@ -20,7 +20,7 @@ pub use mempool::{Mempool, Policy, Refused};
 #[derive(Debug)]
 pub enum Error {
     /// A chain rule refuses the Block or the Checkpoint.
-    Rule(linked_realms_core::Error),
+    Rule(lr_core::Error),
     /// The Block's parent is not stored here: it must come first.
     UnknownParent,
     /// The Block is, or extends, a Block a rule refused.

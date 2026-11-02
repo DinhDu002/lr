@@ -4,9 +4,9 @@
 use std::fs::File;
 use std::io::Read;
 
-use linked_realms_core::SigningKey;
-use linked_realms_core::checkpoint::Checkpoint;
-use linked_realms_core::params::ChainParams;
+use lr_core::SigningKey;
+use lr_core::checkpoint::Checkpoint;
+use lr_core::params::ChainParams;
 
 use crate::Error;
 use crate::p2p::{Network, Node};

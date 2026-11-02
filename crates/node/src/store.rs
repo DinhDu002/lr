@@ -1,15 +1,15 @@
 //! The tables of the chain database and the forms of what they hold. Each change to the chain is
 //! one `redb` write transaction, so a Block is applied, or a branch is left, whole or not at all.
 
-use linked_realms_core::block::{Block, ChainView, HEADER_LEN, Header};
-use linked_realms_core::checkpoint::Checkpoint;
-use linked_realms_core::codec::Reader;
-use linked_realms_core::params::ChainParams;
-use linked_realms_core::smt::{Node, SmtStore};
-use linked_realms_core::state::{Account, PublicKey, State, StateView, tree_key};
-use linked_realms_core::tx::Kind;
-use linked_realms_core::u256::U256;
-use linked_realms_core::{ADDRESS_LEN, Address};
+use lr_core::block::{Block, ChainView, HEADER_LEN, Header};
+use lr_core::checkpoint::Checkpoint;
+use lr_core::codec::Reader;
+use lr_core::params::ChainParams;
+use lr_core::smt::{Node, SmtStore};
+use lr_core::state::{Account, PublicKey, State, StateView, tree_key};
+use lr_core::tx::Kind;
+use lr_core::u256::U256;
+use lr_core::{ADDRESS_LEN, Address};
 use redb::{ReadableTable, StorageError, Table, TableDefinition, WriteTransaction};
 
 use crate::Error;
@@ -53,7 +53,7 @@ pub fn db<T>(result: Result<T, StorageError>) -> T {
 }
 
 /// Bytes this Node wrote, read back.
-fn ours<T>(result: Result<T, linked_realms_core::Error>) -> T {
+fn ours<T>(result: Result<T, lr_core::Error>) -> T {
     result.expect("bytes the Node stored")
 }
 

@@ -10,8 +10,8 @@ use std::process::{Child, ChildStdout, Command, Stdio};
 use std::sync::{Mutex, MutexGuard, mpsc};
 use std::time::{Duration, Instant};
 
-use linked_realms_core::params::DEV_CHECKPOINT_SEED;
-use linked_realms_core::{Address, PUBLIC_KEY_LEN, SCHEME_ML_DSA_44, words_from_entropy};
+use lr_core::params::DEV_CHECKPOINT_SEED;
+use lr_core::{Address, PUBLIC_KEY_LEN, SCHEME_ML_DSA_44, words_from_entropy};
 use serde_json::{Value, json};
 
 struct Data(PathBuf);
@@ -195,7 +195,7 @@ fn lr_node_mines_for_one_address_from_the_start() {
             UnixStream::connect(&socket).unwrap(),
             "",
             "mine_status",
-            json!({ "id": "land" }),
+            json!({ "id": "default" }),
         );
         body["result"].clone()
     };
@@ -204,7 +204,8 @@ fn lr_node_mines_for_one_address_from_the_start() {
 
     // The public RPC has no mine_* method.
     let rpc = lines[1].strip_prefix("rpc ").unwrap();
-    let params = json!({ "id": "land", "rewardAddress": address, "threads": 1, "mode": "light" });
+    let params =
+        json!({ "id": "default", "rewardAddress": address, "threads": 1, "mode": "light" });
     let (_, refused) = post(TcpStream::connect(rpc).unwrap(), "", "mine_start", params);
     assert_eq!(refused["error"]["code"], json!(-32601));
 

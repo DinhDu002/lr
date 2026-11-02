@@ -814,53 +814,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "65cd87c9a6d60536580b316ad985726104730a5151c99845f2490428ef91240a"
 
 [[package]]
-name = "linked-realms-core"
-version = "0.1.0"
-dependencies = [
- "bech32",
- "bip39",
- "fips204",
- "hex",
- "hkdf",
- "ml-dsa",
- "serde",
- "serde_json",
- "sha2",
- "sha3 0.12.0",
- "wasm-bindgen",
- "zeroize",
-]
-
-[[package]]
-name = "linked-realms-node"
-version = "0.1.0"
-dependencies = [
- "hex",
- "http",
- "hyper",
- "jsonrpsee",
- "jsonrpsee-core",
- "jsonrpsee-ws-client",
- "libc",
- "linked-realms-core",
- "linked-realms-randomx",
- "redb",
- "serde",
- "serde_json",
- "tokio",
- "tower",
- "zeroize",
-]
-
-[[package]]
-name = "linked-realms-randomx"
-version = "0.1.0"
-dependencies = [
- "cmake",
- "sha2",
-]
-
-[[package]]
 name = "litemap"
 version = "0.8.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -880,6 +833,53 @@ name = "log"
 version = "0.4.35"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "5d15f86d12da44cd8d4ec3c73984537eb7f4cadcb9776a575a0a8a05ca11005c"
+
+[[package]]
+name = "lr-core"
+version = "0.1.0"
+dependencies = [
+ "bech32",
+ "bip39",
+ "fips204",
+ "hex",
+ "hkdf",
+ "ml-dsa",
+ "serde",
+ "serde_json",
+ "sha2",
+ "sha3 0.12.0",
+ "wasm-bindgen",
+ "zeroize",
+]
+
+[[package]]
+name = "lr-node"
+version = "0.1.0"
+dependencies = [
+ "hex",
+ "http",
+ "hyper",
+ "jsonrpsee",
+ "jsonrpsee-core",
+ "jsonrpsee-ws-client",
+ "libc",
+ "lr-core",
+ "lr-randomx",
+ "redb",
+ "serde",
+ "serde_json",
+ "tokio",
+ "tower",
+ "zeroize",
+]
+
+[[package]]
+name = "lr-randomx"
+version = "0.1.0"
+dependencies = [
+ "cmake",
+ "sha2",
+]
 
 [[package]]
 name = "memchr"

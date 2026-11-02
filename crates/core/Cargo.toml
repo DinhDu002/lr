@@ -1,5 +1,5 @@
 [package]
-name = "linked-realms-core"
+name = "lr-core"
 version = "0.1.0"
 description = "Chain rules, keys, signatures and addresses shared by the Node, the Mine and the Shell"
 edition.workspace = true

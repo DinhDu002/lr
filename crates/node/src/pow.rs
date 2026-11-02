@@ -3,7 +3,7 @@
 
 use std::sync::{Arc, Mutex};
 
-use linked_realms_randomx::{Cache, Vm};
+use lr_randomx::{Cache, Vm};
 
 /// RandomX caches by key, the last two, so the Blocks on both sides of a key change check without
 /// building a cache again. The Node's checks and the Mine's light mode share them (256 MiB each).

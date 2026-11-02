@@ -15,20 +15,20 @@ use std::collections::HashMap;
 use std::ops::Bound;
 use std::path::Path;
 
-use linked_realms_core::Address;
-use linked_realms_core::Error as RuleError;
-use linked_realms_core::block::{
+use lr_core::Address;
+use lr_core::Error as RuleError;
+use lr_core::block::{
     Block, ChainView, Header, check_block, check_header, check_on_accounts, median_time_past,
     state_root_after,
 };
-use linked_realms_core::checkpoint::{Checkpoint, verify_checkpoint};
-use linked_realms_core::merkle::tx_root;
-use linked_realms_core::params::ChainParams;
-use linked_realms_core::retarget::{next_target, work};
-use linked_realms_core::smt;
-use linked_realms_core::state::{Account, State, StateView, tree_key};
-use linked_realms_core::tx::Tx;
-use linked_realms_core::u256::U256;
+use lr_core::checkpoint::{Checkpoint, verify_checkpoint};
+use lr_core::merkle::tx_root;
+use lr_core::params::ChainParams;
+use lr_core::retarget::{next_target, work};
+use lr_core::smt;
+use lr_core::state::{Account, State, StateView, tree_key};
+use lr_core::tx::Tx;
+use lr_core::u256::U256;
 use redb::{Database, ReadableDatabase, ReadableTable};
 
 use crate::Error;

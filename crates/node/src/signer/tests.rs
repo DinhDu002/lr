@@ -1,7 +1,7 @@
 use std::net::SocketAddr;
 
-use linked_realms_core::checkpoint::verify_checkpoint;
-use linked_realms_core::params::DEV_CHECKPOINT_SEED;
+use lr_core::checkpoint::verify_checkpoint;
+use lr_core::params::DEV_CHECKPOINT_SEED;
 
 use super::*;
 use crate::chain::tests::{Builder, File, PARAMS, submit_all};

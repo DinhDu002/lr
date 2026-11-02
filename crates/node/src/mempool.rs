@@ -5,11 +5,11 @@
 use std::cmp::{Ordering, Reverse};
 use std::collections::{BTreeMap, BinaryHeap, HashMap, HashSet};
 
-use linked_realms_core::block::{Block, HEADER_LEN, MAX_BLOCK_SIZE, MAX_NEW_ACCOUNTS};
-use linked_realms_core::params::ChainParams;
-use linked_realms_core::state::{Account, State, StateView};
-use linked_realms_core::tx::{Kind, Tx, apply_tx};
-use linked_realms_core::{ADDRESS_LEN, Address, Error as RuleError};
+use lr_core::block::{Block, HEADER_LEN, MAX_BLOCK_SIZE, MAX_NEW_ACCOUNTS};
+use lr_core::params::ChainParams;
+use lr_core::state::{Account, State, StateView};
+use lr_core::tx::{Kind, Tx, apply_tx};
+use lr_core::{ADDRESS_LEN, Address, Error as RuleError};
 
 use crate::{Chain, Error};
 

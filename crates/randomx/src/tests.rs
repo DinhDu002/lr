@@ -245,7 +245,7 @@ fn the_vendored_tree_is_unchanged() {
     );
 }
 
-/// `cargo test --release -p linked-realms-randomx -- --ignored --nocapture hash_rate`
+/// `cargo test --release -p lr-randomx -- --ignored --nocapture hash_rate`
 ///
 /// Hashes per second with the JIT, in light and fast mode, on 1 thread and on every thread (one
 /// VM each), and how long the Cache and the Dataset take to build. Plan item 9 sets

@@ -5,24 +5,24 @@
 use std::collections::HashMap;
 use std::path::PathBuf;
 
-use linked_realms_core::amount::{format_amount, parse_amount};
-use linked_realms_core::block::{
+use lr_core::amount::{format_amount, parse_amount};
+use lr_core::block::{
     Block, HEADER_LEN, Header, MAX_BLOCK_SIZE, MAX_NEW_ACCOUNTS, NONCE_OFFSET, check_genesis,
     key_height, validate_block,
 };
-use linked_realms_core::checkpoint::{
+use lr_core::checkpoint::{
     CHECKPOINT_CONTEXT, CHECKPOINT_INTERVAL, Checkpoint, signed_bytes, verify_checkpoint,
 };
-use linked_realms_core::issuance::{BASE_UNITS_PER_GOLD, HALVING_INTERVAL, reward};
-use linked_realms_core::merkle::tx_root;
-use linked_realms_core::params::{ChainParams, DEV, DEV_CHECKPOINT_SEED, TESTNET};
-use linked_realms_core::retarget::next_target;
-use linked_realms_core::smt::{self, Node};
-use linked_realms_core::state::{Account, PublicKey, tree_key};
-use linked_realms_core::tx::{Kind, TX_CONTEXT, Tx, apply_tx, check_tx};
-use linked_realms_core::u256::U256;
-use linked_realms_core::{
-    ADDRESS_LEN, Address, Error, SCHEME_ML_DSA_44, SigningKey, character_seed, entropy_from_words,
+use lr_core::issuance::{BASE_UNITS_PER_GOLD, HALVING_INTERVAL, reward};
+use lr_core::merkle::tx_root;
+use lr_core::params::{ChainParams, DEV, DEV_CHECKPOINT_SEED, TESTNET};
+use lr_core::retarget::next_target;
+use lr_core::smt::{self, Node};
+use lr_core::state::{Account, PublicKey, tree_key};
+use lr_core::tx::{Kind, TX_CONTEXT, Tx, apply_tx, check_tx};
+use lr_core::u256::U256;
+use lr_core::{
+    ADDRESS_LEN, Address, Error, SCHEME_ML_DSA_44, SigningKey, derive_seed, entropy_from_words,
     verify, words_from_entropy,
 };
 use serde::de::DeserializeOwned;
@@ -196,6 +196,9 @@ struct CharacterVector {
     /// The BIP-39 seed with an empty passphrase.
     seed: String,
     index: u32,
+    /// The HKDF salt and info, Linked Realms' labels for Character `index`.
+    salt: String,
+    info: String,
     xi: String,
     public_key: String,
     address: String,
@@ -214,7 +217,18 @@ struct StatementVector {
 
 const NOTE: &str = "docs/protocols/identity.md. Bytes are lowercase hex. Signatures use rnd = 32 \
 zero bytes (the deterministic variant) so they can be reproduced; real signers use fresh random \
-bytes. Regenerate with UPDATE_VECTORS=1 cargo test -p linked-realms-core.";
+bytes. Regenerate with UPDATE_VECTORS=1 cargo test -p lr-core.";
+
+/// Linked Realms' salt for its Characters' keys; it goes with these vectors at the split (ADR 0016).
+const CHARACTER_SALT: &str = "linked-realms/ml-dsa-44/v1";
+
+fn character_seed(entropy: &[u8; 32], index: u32) -> zeroize::Zeroizing<[u8; 32]> {
+    derive_seed(
+        entropy,
+        CHARACTER_SALT.as_bytes(),
+        format!("character/{index}").as_bytes(),
+    )
+}
 
 fn generate() -> Identity {
     let entropies: [[u8; 32]; 3] = [[0; 32], core::array::from_fn(|i| i as u8), [0xff; 32]];
@@ -238,6 +252,8 @@ fn generate() -> Identity {
             words,
             seed: hex::encode(seed),
             index,
+            salt: CHARACTER_SALT.to_string(),
+            info: format!("character/{index}"),
             xi: hex::encode(*xi),
             public_key: hex::encode(key.public_key()),
             address: key.address().to_string(),
@@ -494,7 +510,7 @@ struct TxRoot {
 
 const CHAIN_NOTE: &str = "docs/decisions/0011-chain-encodings-and-issuance.md. Bytes are \
 lowercase hex; amounts are decimal strings of base units (1 GOLD = 100000000). Regenerate with \
-UPDATE_VECTORS=1 cargo test -p linked-realms-core.";
+UPDATE_VECTORS=1 cargo test -p lr-core.";
 
 fn generate_chain() -> Chain {
     let (ledger, final_state) = generate_ledger();
@@ -754,7 +770,7 @@ fn generate_checkpoints() -> Checkpoints {
         (
             "signed under the transaction context",
             "dev",
-            raw(&signer, b"linked-realms/tx/v1", 20),
+            raw(&signer, b"lr/tx/v1", 20),
         ),
     ];
     Checkpoints {

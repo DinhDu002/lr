@@ -25,6 +25,8 @@ interface Identity {
     words: string;
     seed: string;
     index: number;
+    salt: string;
+    info: string;
     xi: string;
     publicKey: string;
     address: string;
@@ -100,42 +102,39 @@ const nodeVerifies = (
   );
 
 describe("identity vectors", () => {
-  it.each(vectors.characters)("derives Character $index of $entropy", (c) => {
-    expect(wordsFromEntropy(bytes(c.entropy))).toBe(c.words);
-    expect(hex(entropyFromWords(c.words))).toBe(c.entropy);
+  it.each(vectors.characters)(
+    "derives the key of $entropy under $info",
+    (c) => {
+      expect(wordsFromEntropy(bytes(c.entropy))).toBe(c.words);
+      expect(hex(entropyFromWords(c.words))).toBe(c.entropy);
 
-    const seed = pbkdf2Sync(
-      c.words.normalize("NFKD"),
-      "mnemonic",
-      2048,
-      64,
-      "sha512",
-    );
-    expect(seed.toString("hex")).toBe(c.seed);
-    const xi = hkdfSync(
-      "sha512",
-      seed,
-      "linked-realms/ml-dsa-44/v1",
-      `character/${c.index}`,
-      32,
-    );
-    expect(Buffer.from(xi).toString("hex")).toBe(c.xi);
-    expect(hex(nodePublicKey(new Uint8Array(xi)))).toBe(c.publicKey);
+      const seed = pbkdf2Sync(
+        c.words.normalize("NFKD"),
+        "mnemonic",
+        2048,
+        64,
+        "sha512",
+      );
+      expect(seed.toString("hex")).toBe(c.seed);
+      const xi = hkdfSync("sha512", seed, c.salt, c.info, 32);
+      expect(Buffer.from(xi).toString("hex")).toBe(c.xi);
+      expect(hex(nodePublicKey(new Uint8Array(xi)))).toBe(c.publicKey);
 
-    using key = Key.fromEntropy(bytes(c.entropy), c.index);
-    expect(hex(key.publicKey)).toBe(c.publicKey);
-    expect(key.address).toBe(c.address);
-    expect(addressFromPublicKey(SCHEME_ML_DSA_44, bytes(c.publicKey))).toBe(
-      c.address,
-    );
+      using key = Key.fromEntropy(bytes(c.entropy), c.salt, c.info);
+      expect(hex(key.publicKey)).toBe(c.publicKey);
+      expect(key.address).toBe(c.address);
+      expect(addressFromPublicKey(SCHEME_ML_DSA_44, bytes(c.publicKey))).toBe(
+        c.address,
+      );
 
-    const hash = createHash("keccak-256")
-      .update(Buffer.from([SCHEME_ML_DSA_44]))
-      .update(bytes(c.publicKey))
-      .digest("hex");
-    expect(hex(addressPayload(c.address))).toBe(`0001${hash}`);
-    expect(isAddress(c.address)).toBe(true);
-  });
+      const hash = createHash("keccak-256")
+        .update(Buffer.from([SCHEME_ML_DSA_44]))
+        .update(bytes(c.publicKey))
+        .digest("hex");
+      expect(hex(addressPayload(c.address))).toBe(`0001${hash}`);
+      expect(isAddress(c.address)).toBe(true);
+    },
+  );
 
   it.each(vectors.statements)("signs and verifies under $context", (s) => {
     using key = Key.fromSeed(bytes(s.signerXi));
@@ -224,13 +223,7 @@ describe("keys", () => {
     expect(() => addressFromPublicKey(2, new Uint8Array(1312))).toThrow(
       "unknown signature scheme",
     );
-    // Out of range, not taken modulo 2^bits: index 2^32 + 1 is not Character 1, scheme 257 not 1.
-    const entropy = bytes(vectors.characters[0]!.entropy);
-    for (const index of [-1, 2 ** 32 + 1, 1.5, NaN]) {
-      expect(() => Key.fromEntropy(entropy, index)).toThrow(
-        "index is not an integer in range",
-      );
-    }
+    // Out of range, not taken modulo 2^8: scheme 257 is not 1.
     expect(() => addressFromPublicKey(257, new Uint8Array(1312))).toThrow(
       "scheme is not an integer in range",
     );

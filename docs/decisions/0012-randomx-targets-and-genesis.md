@@ -1,6 +1,6 @@
 # 0012 — RandomX, the Targets, the genesis and Checkpoints
 
-Status: accepted, 2026-10-30 — by the project owner, in step 2C item 9 (plan `docs/plans/phase-2c-the-chain.md`, Answers 4, 17 and 18, and three questions put at item 9).
+Status: accepted, 2026-10-30 — by the project owner, in step 2C item 9 (plan `docs/plans/phase-2c-the-chain.md`, Answers 4, 17 and 18, and three questions put at item 9). Changed on 2026-11-02 by ADR 0016: the Checkpoint context is `lr/checkpoint/v1`, and the test network was reset under decision 6 to id 3 with the genesis timestamp 2026-11-02 00:00 UTC.
 
 ## Context
 

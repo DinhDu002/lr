@@ -12,10 +12,10 @@ use std::sync::{Arc, Mutex};
 use std::thread::{self, JoinHandle};
 use std::time::{Duration, Instant, SystemTime, UNIX_EPOCH};
 
-use linked_realms_core::Address;
-use linked_realms_core::block::{Block, HEADER_LEN, key_height};
-use linked_realms_core::u256::U256;
-use linked_realms_randomx::{Dataset, Vm};
+use lr_core::Address;
+use lr_core::block::{Block, HEADER_LEN, key_height};
+use lr_core::u256::U256;
+use lr_randomx::{Dataset, Vm};
 use tokio::sync::broadcast::error::TryRecvError;
 
 use crate::pow::Keys;

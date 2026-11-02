@@ -15,7 +15,7 @@ fn params(network_id: f64) -> Result<&'static ChainParams, JsError> {
 }
 
 /// wasm-bindgen's own integer arguments take any JavaScript value modulo 2^bits, so `-1n` would
-/// sign the nonce 2^64 - 1 and the network id 2^32 + 1 would be the test network. Integers come
+/// sign the nonce 2^64 - 1 and the network id 2^32 + 3 would be the test network. Integers come
 /// in as a `number` or a `bigint` instead, and are refused out of range.
 fn integer<T: TryFrom<u64>>(name: &str, value: f64) -> Result<T, JsError> {
     (value >= 0.0 && value.fract() == 0.0)
@@ -48,10 +48,10 @@ impl Key {
         Ok(Key(SigningKey::from_seed(array(xi)?)))
     }
 
-    /// Character `index` behind the entropy of 24 words.
+    /// The key behind the entropy of 24 words, under the `salt` and `info` the application chose.
     #[wasm_bindgen(js_name = fromEntropy)]
-    pub fn from_entropy(entropy: &[u8], index: f64) -> Result<Key, JsError> {
-        let xi = crate::character_seed(array(entropy)?, integer("index", index)?);
+    pub fn from_entropy(entropy: &[u8], salt: &str, info: &str) -> Result<Key, JsError> {
+        let xi = crate::derive_seed(array(entropy)?, salt.as_bytes(), info.as_bytes());
         Ok(Key(SigningKey::from_seed(&xi)))
     }
 

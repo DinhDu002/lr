@@ -1,5 +1,5 @@
-use linked_realms_core::block::Header;
-use linked_realms_core::params::DEV;
+use lr_core::block::Header;
+use lr_core::params::DEV;
 
 use super::*;
 use crate::chain::tests::File;

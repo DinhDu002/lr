@@ -3,9 +3,9 @@
 //! from the exponential distribution whose mean is the time the hash rate needs, on average, to
 //! find a Solution below the Target.
 
-use linked_realms_core::params::{ChainParams, TESTNET};
-use linked_realms_core::retarget::next_target;
-use linked_realms_core::u256::U256;
+use lr_core::params::{ChainParams, TESTNET};
+use lr_core::retarget::next_target;
+use lr_core::u256::U256;
 
 /// splitmix64, so every run draws the same solvetimes.
 struct Rng(u64);
@@ -185,7 +185,7 @@ fn block_time_returns_to_60_seconds_after_a_rise_and_a_fall() {
     );
 }
 
-/// `cargo test --release -p linked-realms-core --test retarget_simulation -- --ignored --nocapture`
+/// `cargo test --release -p lr-core --test retarget_simulation -- --ignored --nocapture`
 ///
 /// Compares windows. Steady: the mean solvetime at a constant hash rate, and how far each Block's
 /// expected solvetime strays from `T` (standard deviation). Steps: as above. On and off: a Mine

@@ -1,6 +1,6 @@
 //! Makes a Checkpoint signer's key, which the project owner holds (ADR 0015, ADR 0012):
 //!
-//! `cargo run -q -p linked-realms-core --example checkpoint_key -- <words file> <key file>`
+//! `cargo run -q -p lr-core --example checkpoint_key -- <words file> <key file>`
 //!
 //! The key's 24 words go to `<words file>`, readable by its owner only and never overwritten; only
 //! the public key, in hex, goes to `<key file>`. The key is ML-DSA-44 from the seed `xi` that is
@@ -12,7 +12,7 @@ use std::fs::{File, OpenOptions};
 use std::io::{Read, Write};
 use std::os::unix::fs::OpenOptionsExt;
 
-use linked_realms_core::{ENTROPY_LEN, SigningKey, words_from_entropy};
+use lr_core::{ENTROPY_LEN, SigningKey, words_from_entropy};
 use zeroize::Zeroizing;
 
 fn main() {
