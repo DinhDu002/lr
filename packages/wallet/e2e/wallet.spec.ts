@@ -46,14 +46,23 @@ test.describe("Gold", () => {
     );
   });
 
-  test("copies the address", async ({ page, context, account }) => {
-    await context.grantPermissions(["clipboard-read", "clipboard-write"]);
+  test("copies the address", async ({
+    page,
+    context,
+    account,
+    browserName,
+  }) => {
+    // Reading the clipboard back needs Chromium's clipboard permissions; Firefox has none to grant.
+    const readBack = browserName === "chromium";
+    if (readBack)
+      await context.grantPermissions(["clipboard-read", "clipboard-write"]);
     await openWallet(page);
     await page.getByRole("button", { name: "Copy address" }).click();
     await expect(page.locator("#copy-address")).toHaveText("Copied");
-    expect(await page.evaluate(() => navigator.clipboard.readText())).toBe(
-      account.address,
-    );
+    if (readBack)
+      expect(await page.evaluate(() => navigator.clipboard.readText())).toBe(
+        account.address,
+      );
   });
 
   test("shows the payment prompt; nothing is sent until Approve is clicked", async ({
