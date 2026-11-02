@@ -262,6 +262,8 @@ Also decided: Node.js 26 LTS; the repository is public; all repository content i
 
 <!-- Claude Code records the date and the completed work here, newest first. -->
 
+- 2026-11-02: Linked Realms' repository `DinhDu002/linked-realms` is public, cut from the tag `pre-split` with `git filter-repo`, and depends on `@dinhdu002/lr-core` 0.1.0 and `ghcr.io/dinhdu002/lr-node:0.1.0`. Its CI is green. Its image workflow cannot push `ghcr.io/dinhdu002/linked-realms-node` (`permission_denied: write_package`) because that package is still linked to this repository; the project owner grants the new repository write access in the package's "Manage Actions access" settings, then reruns the workflow.
+
 - 2026-11-02: Release v0.1.0, from the tag `v0.1.0` on `main` (dd6db52, the merge of PR #39). `package.yml` published `@dinhdu002/lr-core` 0.1.0 to GitHub Packages and `image.yml` published `ghcr.io/dinhdu002/lr-node:0.1.0` for amd64 and arm64; both are public and linked to this repository. Checked from outside the workspace: the image pulls without a login and runs `lr-node`; the package installs with a token that can read packages (GitHub Packages asks for one even for a public package), and `accountKey` of the entropy of 32 bytes of 0x01 gives the address of development account 1 in `compose.yaml`.
 
 - 2026-11-02: The split, ADR 0017: this repository is LR alone, on branch `phase-2/2c-lr-only`.
