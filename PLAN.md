@@ -162,7 +162,7 @@ Items 28 (the split) and 29 (the launch), and the Done-when with Lands, are repl
 ### Before the main network
 
 - [x] **(a) The split** (ADR 0017): this repository is LR alone and is renamed `DinhDu002/lr`; the game moves to `DinhDu002/linked-realms`; the web wallet stays with LR.
-- [ ] **(b) Release v0.1.0:** the package `@dinhdu002/lr-core` on GitHub Packages and the image `ghcr.io/dinhdu002/lr-node`, built by CI from a tag.
+- [x] **(b) Release v0.1.0:** the package `@dinhdu002/lr-core` on GitHub Packages and the image `ghcr.io/dinhdu002/lr-node`, built by CI from a tag. Released 2026-11-02.
 - [ ] **(c) The chain-only test.** **Done when:** on the test network, three people on three different machines each run `lr-node mine` and each wins Blocks, they send Gold to one another with the wallet, and the Checkpoint signer keeps signing Checkpoints throughout. Steps: `docs/runbooks/lr-services.md`, section 5.
 - [ ] **(d) The main network launch, by the project owner only (P7):** a genesis without premine, the main network's id, the `lr` address prefix and the Checkpoint end height 1,051,200 in the genesis code; the test network stops.
 
@@ -253,7 +253,7 @@ Also decided: Node.js 26 LTS; the repository is public; all repository content i
 - [x] 2C – The chain: items 1 to 27 built, the test network's services running (`docs/plans/phase-2c-the-chain.md`)
 - [ ] Before the main network (section 6)
   - [x] (a) The split (ADR 0017)
-  - [ ] (b) Release v0.1.0: `@dinhdu002/lr-core` and `ghcr.io/dinhdu002/lr-node`
+  - [x] (b) Release v0.1.0: `@dinhdu002/lr-core` and `ghcr.io/dinhdu002/lr-node`
   - [ ] (c) The chain-only test on the test network
   - [ ] (d) The main network launch, by the project owner only
 - [ ] Audit (after the genesis)
@@ -261,6 +261,10 @@ Also decided: Node.js 26 LTS; the repository is public; all repository content i
 ### Log
 
 <!-- Claude Code records the date and the completed work here, newest first. -->
+
+- 2026-11-02: Linked Realms' repository `DinhDu002/linked-realms` is public, cut from the tag `pre-split` with `git filter-repo`, and depends on `@dinhdu002/lr-core` 0.1.0 and `ghcr.io/dinhdu002/lr-node:0.1.0`. Its CI is green. Its image workflow cannot push `ghcr.io/dinhdu002/linked-realms-node` (`permission_denied: write_package`) because that package is still linked to this repository; the project owner grants the new repository write access in the package's "Manage Actions access" settings, then reruns the workflow.
+
+- 2026-11-02: Release v0.1.0, from the tag `v0.1.0` on `main` (dd6db52, the merge of PR #39). `package.yml` published `@dinhdu002/lr-core` 0.1.0 to GitHub Packages and `image.yml` published `ghcr.io/dinhdu002/lr-node:0.1.0` for amd64 and arm64; both are public and linked to this repository. Checked from outside the workspace: the image pulls without a login and runs `lr-node`; the package installs with a token that can read packages (GitHub Packages asks for one even for a public package), and `accountKey` of the entropy of 32 bytes of 0x01 gives the address of development account 1 in `compose.yaml`.
 
 - 2026-11-02: The split, ADR 0017: this repository is LR alone, on branch `phase-2/2c-lr-only`.
   - The project owner decided that the game moves to `DinhDu002/linked-realms`, cut from the tag `pre-split` with `git filter-repo`, and that this repository is renamed `DinhDu002/lr`. A teammate's Hub v1 replaced `hub-api` on `hub.linkedrealms.com`, and the game joins it through the connect-agent's local contract.

@@ -2,7 +2,7 @@
 
 LR is a Proof-of-Work chain that holds money and nothing else. Its money is Gold (`GOLD`), kept in Accounts under rules that every Node checks for itself. Gold is created only as Block rewards, on a fixed schedule with no premine, and anyone can run a Mine for an address. Its first application is the game [Linked Realms](https://github.com/DinhDu002/linked-realms), which lives in its own repository.
 
-> **Status:** the chain is built and runs on the test network. Next come release v0.1.0, a chain-only test (three people on three machines mine, send Gold to one another and see Checkpoints signed), and then the main network, which only the project owner launches and which is never reset. Details: [PLAN.md](PLAN.md) section 6 and [ADR 0017](docs/decisions/0017-lr-alone-the-game-moves-out.md).
+> **Status:** the chain is built and runs on the test network. Release v0.1.0 is out. Next come a chain-only test (three people on three machines mine, send Gold to one another and see Checkpoints signed), and then the main network, which only the project owner launches and which is never reset. Details: [PLAN.md](PLAN.md) section 6 and [ADR 0017](docs/decisions/0017-lr-alone-the-game-moves-out.md).
 
 ## The test network
 
@@ -39,7 +39,7 @@ docker logs -f lr-mine
 docker stop lr-mine   # stops mining
 ```
 
-- `<version>` is a release's version, such as `0.1.0`; the image is published from v0.1.0 on.
+- `<version>` is a release's version, such as `0.1.0`.
 - A new Node syncs the chain from the seed, checking every Block, before it can win Blocks. The chain is kept in the `lr-data` volume.
 - `--mode light` hashes over a 256 MiB cache and needs little memory. `--mode fast` hashes over a dataset of about 2 GiB, several times faster per thread, and needs that memory free. `--mode auto` (the default) takes fast when at least 2.5 GiB is available.
 - `--threads` is how many CPU threads mine (default 1). Mining is off at every start unless you run `mine`.
