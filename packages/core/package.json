@@ -1,7 +1,13 @@
 {
-  "name": "@linked-realms/core",
-  "version": "0.0.0",
-  "private": true,
+  "name": "@dinhdu002/lr-core",
+  "version": "0.1.0",
+  "description": "LR's keys, signatures, addresses and transactions: the WebAssembly build of crates/core",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DinhDu002/lr.git",
+    "directory": "packages/core"
+  },
   "type": "module",
   "exports": {
     ".": {
@@ -9,8 +15,30 @@
       "default": "./src/node.ts"
     }
   },
+  "files": [
+    "dist",
+    "pkg/lr_core.js",
+    "pkg/lr_core.d.ts",
+    "pkg/lr_core_bg.wasm",
+    "pkg/lr_core_bg.wasm.d.ts"
+  ],
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com",
+    "exports": {
+      ".": {
+        "browser": {
+          "types": "./dist/browser.d.ts",
+          "default": "./dist/browser.js"
+        },
+        "default": {
+          "types": "./dist/node.d.ts",
+          "default": "./dist/node.js"
+        }
+      }
+    }
+  },
   "scripts": {
-    "build": "cargo build -p lr-core --features wasm --target wasm32-unknown-unknown --profile wasm && wasm-bindgen --target web --out-dir pkg ../../target/wasm32-unknown-unknown/wasm/lr_core.wasm",
+    "build": "cargo build -p lr-core --features wasm --target wasm32-unknown-unknown --profile wasm && wasm-bindgen --target web --out-dir pkg ../../target/wasm32-unknown-unknown/wasm/lr_core.wasm && tsc -p tsconfig.build.json",
     "typecheck": "tsc",
     "test": "vitest run --fsModuleCachePath node_modules/.vitest-cache"
   },

@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>LR wallet</title>
+    <link rel="stylesheet" href="/src/wallet.css" />
+    <!-- Add to Home Screen opens the wallet without the browser's bars. -->
+    <link rel="manifest" href="/manifest.json" />
+  </head>
+  <body>
+    <header id="bar">
+      <strong>LR wallet</strong>
+      <span id="status" role="status"></span>
+      <span class="spacer"></span>
+      <button id="lock" type="button" hidden>Lock</button>
+      <button id="unlock-button" type="button" hidden>Unlock</button>
+      <p id="warning">The wallet never asks for your 24 words outside Setup.</p>
+    </header>
+
+    <main>
+      <section id="view-no-account" hidden>
+        <h1>No account in this browser</h1>
+        <p>
+          <a href="/setup.html">Create an account or restore one</a> to get
+          started.
+        </p>
+      </section>
+
+      <section id="view-locked" hidden>
+        <h1>The wallet is locked</h1>
+        <p>Unlock it with your password to see your Gold.</p>
+      </section>
+
+      <div id="view-home" hidden>
+        <section aria-labelledby="account-title">
+          <h2 id="account-title">Account</h2>
+          <p>
+            <code id="account-address"></code>
+            <button id="copy-address" type="button">Copy address</button>
+          </p>
+        </section>
+
+        <section aria-labelledby="gold-title">
+          <h2 id="gold-title">Gold</h2>
+          <p>Balance: <strong id="balance">…</strong></p>
+          <p id="gold-status" role="status"></p>
+          <form id="send-form">
+            <h3>Send Gold</h3>
+            <label for="send-to">Recipient address</label>
+            <input
+              id="send-to"
+              autocomplete="off"
+              spellcheck="false"
+              placeholder="tlr1…"
+              required
+            />
+            <label for="send-amount">Amount (GOLD)</label>
+            <input
+              id="send-amount"
+              inputmode="decimal"
+              autocomplete="off"
+              required
+            />
+            <label for="send-memo">Memo (optional, at most 80 bytes)</label>
+            <input id="send-memo" autocomplete="off" />
+            <label for="send-fee">Fee (GOLD, empty for automatic)</label>
+            <input id="send-fee" inputmode="decimal" autocomplete="off" />
+            <p>
+              <button id="send-submit" type="submit">Send</button>
+            </p>
+            <p id="send-status" role="status"></p>
+          </form>
+          <h3>Recent transactions</h3>
+          <ul id="transactions" aria-label="Recent transactions"></ul>
+        </section>
+      </div>
+    </main>
+
+    <dialog id="unlock" aria-labelledby="unlock-title">
+      <form id="unlock-form" method="dialog">
+        <h2 id="unlock-title">Unlock the wallet</h2>
+        <p>Enter your password. Only the wallet's own page asks for it.</p>
+        <label for="password">Password</label>
+        <input
+          id="password"
+          type="password"
+          autocomplete="current-password"
+          required
+        />
+        <p id="unlock-error" role="alert"></p>
+        <div class="actions">
+          <button id="unlock-cancel" type="button">Cancel</button>
+          <button id="unlock-submit" type="submit">Unlock</button>
+        </div>
+      </form>
+    </dialog>
+
+    <dialog
+      id="pay"
+      class="prompt"
+      tabindex="-1"
+      autofocus
+      aria-labelledby="pay-title"
+    >
+      <form method="dialog">
+        <h2 id="pay-title">Send Gold</h2>
+        <p>
+          Check every line. Gold sent on the chain cannot be taken back. The
+          wallet signs only when you approve.
+        </p>
+        <dl>
+          <dt>From</dt>
+          <dd id="pay-from"></dd>
+          <dt>To</dt>
+          <dd id="pay-to"></dd>
+          <dt>Amount</dt>
+          <dd id="pay-amount"></dd>
+          <dt>Memo</dt>
+          <dd id="pay-memo"></dd>
+          <dt>Fee</dt>
+          <dd id="pay-fee"></dd>
+          <dt>Total</dt>
+          <dd id="pay-total"></dd>
+        </dl>
+        <div class="actions">
+          <button id="pay-deny" value="deny">Deny</button>
+          <button id="pay-approve" type="button" aria-disabled="true">
+            Approve
+          </button>
+        </div>
+      </form>
+    </dialog>
+
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

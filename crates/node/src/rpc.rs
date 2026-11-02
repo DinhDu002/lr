@@ -64,7 +64,7 @@ pub struct Config {
     /// HTTP requests and WebSocket connections served at once.
     pub max_connections: u32,
     /// The proxies in front of it, if any: a request from one counts for the client its
-    /// `X-Forwarded-For` names, as hub-api counts its clients.
+    /// `X-Forwarded-For` names, as a rate limiter counts its clients.
     pub proxies: Vec<IpAddr>,
 }
 

@@ -22,8 +22,8 @@ use lr_core::state::{Account, PublicKey, tree_key};
 use lr_core::tx::{Kind, TX_CONTEXT, Tx, apply_tx, check_tx};
 use lr_core::u256::U256;
 use lr_core::{
-    ADDRESS_LEN, Address, Error, SCHEME_ML_DSA_44, SigningKey, derive_seed, entropy_from_words,
-    verify, words_from_entropy,
+    ACCOUNT_SALT, ADDRESS_LEN, Address, Error, SCHEME_ML_DSA_44, SigningKey, account_seed,
+    entropy_from_words, verify, words_from_entropy,
 };
 use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
@@ -133,7 +133,7 @@ fn matches_the_ml_dsa_crate() {
             their_public.encode().as_slice()
         );
 
-        let (context, message) = (b"linked-realms/test/v1".as_slice(), [i; 100]);
+        let (context, message) = (b"lr/test/v1".as_slice(), [i; 100]);
         let deterministic = ours.sign(context, &message, &[0; 32]).unwrap();
         let theirs_signed = theirs.sign_deterministic(&message, context).unwrap();
         assert_eq!(deterministic.as_slice(), theirs_signed.encode().as_slice());
@@ -176,8 +176,7 @@ fn bip39_reference_vectors() {
 #[serde(rename_all = "camelCase")]
 struct Identity {
     note: String,
-    characters: Vec<CharacterVector>,
-    statements: Vec<StatementVector>,
+    accounts: Vec<KeyVector>,
     /// Strings every reader must refuse as an address, each with the rule it breaks.
     invalid_addresses: Vec<InvalidAddress>,
 }
@@ -190,13 +189,13 @@ struct InvalidAddress {
 
 #[derive(Serialize, Deserialize, PartialEq, Debug)]
 #[serde(rename_all = "camelCase")]
-struct CharacterVector {
+struct KeyVector {
     entropy: String,
     words: String,
     /// The BIP-39 seed with an empty passphrase.
     seed: String,
     index: u32,
-    /// The HKDF salt and info, Linked Realms' labels for Character `index`.
+    /// The HKDF salt and info, LR's labels for Account `index`.
     salt: String,
     info: String,
     xi: String,
@@ -204,35 +203,13 @@ struct CharacterVector {
     address: String,
 }
 
-#[derive(Serialize, Deserialize, PartialEq, Debug)]
-#[serde(rename_all = "camelCase")]
-struct StatementVector {
-    context: String,
-    statement: String,
-    signer_xi: String,
-    public_key: String,
-    address: String,
-    signature: String,
-}
-
 const NOTE: &str = "docs/protocols/identity.md. Bytes are lowercase hex. Signatures use rnd = 32 \
 zero bytes (the deterministic variant) so they can be reproduced; real signers use fresh random \
 bytes. Regenerate with UPDATE_VECTORS=1 cargo test -p lr-core.";
 
-/// Linked Realms' salt for its Characters' keys; it goes with these vectors at the split (ADR 0016).
-const CHARACTER_SALT: &str = "linked-realms/ml-dsa-44/v1";
-
-fn character_seed(entropy: &[u8; 32], index: u32) -> zeroize::Zeroizing<[u8; 32]> {
-    derive_seed(
-        entropy,
-        CHARACTER_SALT.as_bytes(),
-        format!("character/{index}").as_bytes(),
-    )
-}
-
 fn generate() -> Identity {
     let entropies: [[u8; 32]; 3] = [[0; 32], core::array::from_fn(|i| i as u8), [0xff; 32]];
-    let mut characters = Vec::new();
+    let mut accounts = Vec::new();
     for (entropy, index) in [
         (entropies[0], 0),
         (entropies[0], 1),
@@ -245,101 +222,27 @@ fn generate() -> Identity {
         let seed = bip39::Mnemonic::parse_normalized(&words)
             .unwrap()
             .to_seed_normalized("");
-        let xi = character_seed(&entropy, index);
+        let xi = account_seed(&entropy, index);
         let key = SigningKey::from_seed(&xi);
-        characters.push(CharacterVector {
+        accounts.push(KeyVector {
             entropy: hex::encode(entropy),
             words,
             seed: hex::encode(seed),
             index,
-            salt: CHARACTER_SALT.to_string(),
-            info: format!("character/{index}"),
+            salt: String::from_utf8(ACCOUNT_SALT.to_vec()).unwrap(),
+            info: format!("account/{index}"),
             xi: hex::encode(*xi),
             public_key: hex::encode(key.public_key()),
             address: key.address().to_string(),
         });
     }
 
-    let character_xi = *character_seed(&entropies[1], 0);
-    let map_server_xi = [0x4d; 32];
-    let hub_xi = [0x48; 32];
-    let character = SigningKey::from_seed(&character_xi).address();
-    let map_server = SigningKey::from_seed(&map_server_xi).address();
-    let (hub, issued, nonce) = (
-        "hub.example.org",
-        1_793_232_000,
-        "00112233445566778899aabbccddeeff",
-    );
-    let unsigned = [
-        (
-            "hub-sign-in",
-            character_xi,
-            format!("linked-realms Hub sign-in\nHub: {hub}\nNonce: {nonce}\nIssued: {issued}"),
-        ),
-        (
-            "map-server",
-            map_server_xi,
-            format!(
-                "linked-realms Map server\nHub: {hub}\nOwner: {character}\nMap server key: {map_server}\nIssued: {issued}"
-            ),
-        ),
-        (
-            "delegation",
-            character_xi,
-            format!(
-                "linked-realms Delegation\nHub: {hub}\nOwner: {character}\nMap server key: {map_server}\nIssued: {issued}"
-            ),
-        ),
-        (
-            "travel-ticket",
-            hub_xi,
-            format!(
-                "linked-realms Travel ticket\nHub: {hub}\nCharacter: {character}\nName: Mai\nLand: 7\nGate: 4\nIssued: {issued}\nExpires: {}\nNonce: {nonce}",
-                issued + 60
-            ),
-        ),
-        (
-            "arrival",
-            character_xi,
-            format!("linked-realms arrival\nLand: 7\nTicket nonce: {nonce}\nDriven by AI: no"),
-        ),
-        (
-            "relay-host",
-            map_server_xi,
-            format!("linked-realms relay host\nRelay: localhost:8788\nLand: 7\nNonce: {nonce}"),
-        ),
-        (
-            "land-message",
-            character_xi,
-            format!(
-                "linked-realms Land message\nLand: 7\nLand URL: https://7.lands.example\nCharacter: {character}\nIssued: {issued}\nMessage: \"Xin ch\\u00e0o \\\"Mai\\\"\\u000aSee you at the \\ud83c\\udff0\""
-            ),
-        ),
-    ];
-    let statements = unsigned
-        .into_iter()
-        .map(|(name, xi, statement)| {
-            let key = SigningKey::from_seed(&xi);
-            let context = format!("linked-realms/{name}/v1");
-            let signature = key
-                .sign(context.as_bytes(), statement.as_bytes(), &[0; 32])
-                .unwrap();
-            StatementVector {
-                context,
-                statement,
-                signer_xi: hex::encode(xi),
-                public_key: hex::encode(key.public_key()),
-                address: key.address().to_string(),
-                signature: hex::encode(signature),
-            }
-        })
-        .collect();
+    let account = SigningKey::from_seed(&account_seed(&entropies[1], 0)).address();
 
     Identity {
         note: NOTE.into(),
-        characters,
-        statements,
-        invalid_addresses: invalid_addresses(&character),
+        accounts,
+        invalid_addresses: invalid_addresses(&account),
     }
 }
 
@@ -408,26 +311,6 @@ fn invalid_addresses(valid: &Address) -> Vec<InvalidAddress> {
 #[test]
 fn identity_vectors() {
     let generated = generate();
-    for statement in &generated.statements {
-        let signature = hex::decode(&statement.signature).unwrap();
-        let public_key = hex::decode(&statement.public_key).unwrap();
-        let (context, message) = (statement.context.as_bytes(), statement.statement.as_bytes());
-        assert!(verify(
-            SCHEME_ML_DSA_44,
-            &public_key,
-            context,
-            message,
-            &signature
-        ));
-        assert!(!verify(
-            SCHEME_ML_DSA_44,
-            &public_key,
-            b"linked-realms/other/v1",
-            message,
-            &signature
-        ));
-        assert!(statement.address.parse::<Address>().is_ok());
-    }
     for invalid in &generated.invalid_addresses {
         assert!(
             invalid.address.parse::<Address>().is_err(),

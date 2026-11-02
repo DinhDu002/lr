@@ -1,6 +1,8 @@
 # 0015 — LR, its own product, and its main network
 
-Status: accepted, 2026-10-30 — by the project owner, in a design review that began with the question whether the chain and the game should be two repositories. It replaces P7 (approved by the project owner), supersedes parts of ADR 0006 (points 9, 11 and 12, the audit in point 4, and the Consequences), drops the legal review that ADR 0008 decision 7 placed in Phase 3, and changes ADR 0011 (decisions 3 and 8) and the step 2C plan's answers 13, 19 and 22.
+Status: accepted, 2026-10-30 — by the project owner, in a design review that began with the question whether the chain and the game should be two repositories. It replaces P7 (approved by the project owner), supersedes parts of ADR 0006 (points 9, 11 and 12, the audit in point 4, and the Consequences), drops the legal review that ADR 0008 decision 7 placed in Phase 3, and changes ADR 0011 (decisions 3 and 8) and the step 2C plan's answers 13, 19 and 22. Decision 6 (the direction of the split) and the step 2C Done-when are changed by ADR 0017.
+
+ADRs 0001–0005, 0007, 0008, 0010 and 0014 named in this file are Linked Realms' (the game's repository, [`docs/decisions/` at `pre-split`](https://github.com/DinhDu002/linked-realms/tree/pre-split/docs/decisions)).
 
 ## Context
 
@@ -36,7 +38,7 @@ ADR 0006 built the chain for the game: a test network only, reset with notice, w
    - Rejected: a company-held signer, a 2-of-3 signature, and ending Checkpoints on a promise to delete the key. Nobody can check that a key was deleted, and Nodes would still accept its Checkpoints. Rejected: leaving the end height to a later decision, which keeps the trusted role open-ended.
 6. **The repository splits at the end of step 2C, before the genesis.**
    - LR moves to its own repository with `git filter-repo`, so its history comes with it.
-   - Until then LR has its own glossary, `crates/CONTEXT.md`, and new Linked Realms terms stay out of the paths that go with LR (`CONTEXT-MAP.md`). The game terms already there are listed in `CONTEXT-MAP.md`.
+   - Until then LR has its own glossary, `crates/CONTEXT.md` (now `CONTEXT.md`), and new Linked Realms terms stay out of the paths that go with LR (`CONTEXT-MAP.md`, [at `pre-split`](https://github.com/DinhDu002/linked-realms/blob/pre-split/CONTEXT-MAP.md)). The game terms already there are listed in `CONTEXT-MAP.md` at `pre-split`.
    - Rejected: splitting now, which turns every step 2C item that touches both the chain and a Land (17, 19 and 21 to 24) into pull requests in two repositories, and needs the WebAssembly package published to npm first. Rejected: waiting for a second application.
 7. **State growth: at most 50 new Accounts per Block (R2), path-compressed storage (R1), and a relay dust policy (A').** This replaces Answer 22's bound, which was the Block size alone.
    - **R2, a chain rule:** a Block creates at most 50 new Accounts, counted as the number of Accounts after the Block minus the number before it, the reward address included. Item 5 adds it to `validate_block` and writes it into ADR 0011 decision 8, Answer 22 and `docs/protocols/blocks.md`.

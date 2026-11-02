@@ -1,5 +1,5 @@
 //! Keys, signatures and addresses (docs/protocols/identity.md, ADR 0009), and the chain rules
-//! (ADR 0011), which the Node, the Mine and the Shell all use (P9).
+//! (ADR 0011), which the Node, the Mine and the wallet all use (P9).
 
 use core::fmt;
 use core::str::FromStr;
@@ -39,7 +39,7 @@ pub const ADDRESS_HRP: &str = "tlr";
 pub const ADDRESS_LEN: usize = 34;
 pub const PUBLIC_KEY_LEN: usize = ml_dsa_44::PK_LEN;
 pub const SIGNATURE_LEN: usize = ml_dsa_44::SIG_LEN;
-/// Entropy behind a Character's 24 words.
+/// Entropy behind the 24 words.
 pub const ENTROPY_LEN: usize = 32;
 /// Seed `xi` of ML-DSA key generation.
 pub const SEED_LEN: usize = 32;
@@ -187,6 +187,14 @@ pub fn derive_seed(
         .expand(info, xi.as_mut_slice())
         .expect("32 bytes is a valid HKDF-SHA512 output length");
     xi
+}
+
+/// LR's HKDF salt for its wallets' keys; an application may choose its own (ADR 0016, 0017).
+pub const ACCOUNT_SALT: &[u8] = b"lr/ml-dsa-44/v1";
+
+/// The seed `xi` of Account `index` behind `entropy`, with LR's own salt and `account/{index}`.
+pub fn account_seed(entropy: &[u8; ENTROPY_LEN], index: u32) -> Zeroizing<[u8; SEED_LEN]> {
+    derive_seed(entropy, ACCOUNT_SALT, format!("account/{index}").as_bytes())
 }
 
 /// An ML-DSA-44 key pair. The private key is wiped when it is dropped.

@@ -1,6 +1,6 @@
 # Node RPC (public)
 
-Status: the public interface of `lr-node` (ADR 0013). Shells, Lands, the Dashboard and anyone else read the chain and send transactions and Checkpoints through it. It holds no key and changes nothing but the mempool and the Checkpoints, both checked by the same rules as from another Node. The reference implementation is `crates/node/src/rpc.rs` (the server) and `crates/node/src/run.rs` (the thread that owns the Node); the tests are `crates/node/src/rpc/tests.rs`.
+Status: the public interface of `lr-node` (ADR 0013). Wallets, applications, dashboards and anyone else read the chain and send transactions and Checkpoints through it. It holds no key and changes nothing but the mempool and the Checkpoints, both checked by the same rules as from another Node. The reference implementation is `crates/node/src/rpc.rs` (the server) and `crates/node/src/run.rs` (the thread that owns the Node); the tests are `crates/node/src/rpc/tests.rs`.
 
 The admin methods (`node_info`, `lr_getConnections`, `lr_addNode`) and every `mine_*` method are never served here. They are only on the control listener (item 17), a Unix socket or an authenticated listener.
 

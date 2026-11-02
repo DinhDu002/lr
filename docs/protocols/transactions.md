@@ -1,6 +1,6 @@
 # Transactions and accounts
 
-Status: mandatory (ADR 0006, ADR 0011). Every Node checks transactions exactly this way, and every Shell builds them this way. The reference implementation is `crates/core` (`tx.rs`, `state.rs`, `smt.rs`); the vectors are `crates/core/test-vectors/chain.json` (`transactions`, `stateTree`, `stateSnapshots`).
+Status: mandatory (ADR 0006, ADR 0011). Every Node checks transactions exactly this way, and every wallet builds them this way. The reference implementation is `crates/core` (`tx.rs`, `state.rs`, `smt.rs`); the vectors are `crates/core/test-vectors/chain.json` (`transactions`, `stateTree`, `stateSnapshots`).
 
 All integers are big-endian and fixed width. An address is its 34-byte payload (`docs/protocols/identity.md`). Amounts and fees are in base units: 1 GOLD is 100,000,000.
 
@@ -28,13 +28,13 @@ Sizes for scheme 1: a transfer is 2,517 bytes plus the memo, and 1,312 more on t
 
 ## Signed bytes, signature and id
 
-- **Signed bytes:** the network id (4 bytes: `3` on the test network, `2` on the dev network), then every field above except the signature. The network id is not in the transaction; the Node and the Shell take it from the network they are on.
+- **Signed bytes:** the network id (4 bytes: `3` on the test network, `2` on the dev network), then every field above except the signature. The network id is not in the transaction; the Node and the wallet take it from the network they are on.
 - **Signature:** ML-DSA over the signed bytes, with the context `lr/tx/v1`, by the key the sender's account holds, or the key in the transaction on the first one. A signature made for one network does not verify on another.
 - **Id:** `keccak256(signed bytes)`. A new signature of the same transaction keeps its id.
 
 ## Amounts as people write them
 
-Transactions hold base units; the Shell and the Land UI read and show GOLD (`crates/core/src/amount.rs`, `parseAmount` and `formatAmount` in `@linked-realms/core`). Nodes do not use these rules.
+Transactions hold base units; wallets and applications read and show GOLD (`crates/core/src/amount.rs`, `parseAmount` and `formatAmount` in `@dinhdu002/lr-core`). Nodes do not use these rules.
 
 - **Read:** digits, then optionally a dot and 1 to 8 digits. Nothing else: no sign, space, comma or exponent, and `1.` and `.5` are refused. Leading zeros are allowed. A value past `2^64 - 1` base units is `Overflow`; any other text is `BadAmount`.
 - **Shown:** the whole GOLD, then, if there is a fraction, a dot and the fraction without trailing zeros: `150000000` is `1.5`, `1` is `0.00000001`, `100000000` is `1`. What is shown reads back to the same base units.

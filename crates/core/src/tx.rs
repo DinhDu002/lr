@@ -22,7 +22,7 @@ pub enum Kind {
         to: Address,
         /// In base units.
         amount: u64,
-        /// Any bytes; a Shell shows it escaped.
+        /// Any bytes; a wallet shows it escaped.
         memo: Vec<u8>,
     },
     /// Replaces the sender's stored key. The address stays the same.

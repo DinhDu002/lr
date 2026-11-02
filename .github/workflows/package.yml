@@ -1,0 +1,41 @@
+# Publishes @dinhdu002/lr-core (packages/core) to GitHub Packages on a tag v<version>, which must
+# be the version in packages/core/package.json.
+name: package
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: read
+
+jobs:
+  publish:
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+          registry-url: https://npm.pkg.github.com
+          scope: "@dinhdu002"
+      - run: rustup toolchain install
+      - name: Install wasm-bindgen-cli
+        run: |
+          curl -sSfL -o wasm-bindgen.tar.gz "https://github.com/wasm-bindgen/wasm-bindgen/releases/download/$V/wasm-bindgen-$V-x86_64-unknown-linux-musl.tar.gz"
+          echo "82d12bb940e2d4e72e0d5605387fc1b8ca179044e012b620f0ce4e7440e8320e  wasm-bindgen.tar.gz" | sha256sum -c
+          tar -xzf wasm-bindgen.tar.gz --strip-components=1 -C "$HOME/.cargo/bin" "wasm-bindgen-$V-x86_64-unknown-linux-musl/wasm-bindgen"
+        env:
+          V: 0.2.129 # the wasm-bindgen version in crates/core/Cargo.toml
+      - run: pnpm install --frozen-lockfile
+      - name: The tag is v + packages/core's version
+        run: test "$GITHUB_REF_NAME" = "v$(node -p 'require("./packages/core/package.json").version')"
+      - run: pnpm --filter @dinhdu002/lr-core build
+      - run: pnpm --filter @dinhdu002/lr-core publish --no-git-checks
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
