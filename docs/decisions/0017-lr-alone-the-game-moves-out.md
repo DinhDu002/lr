@@ -1,6 +1,6 @@
 # 0017 — LR alone: the game moves out
 
-Status: accepted, 2026-11-02 — by the project owner, who chose the repository split, the names `DinhDu002/lr` and `DinhDu002/linked-realms`, keeping the Shell's wallet part as LR's web wallet, the connect-agent for the game, and the chain-only gate. The wallet's labels (decision 3) and decisions 5 and 6 were filled in by Claude under the owner's go-ahead for the split, and await their review. It changes ADR 0015 (decision 6, the direction of the split, and step 2C's Done-when) and ADR 0016 (decision 4: the package name takes effect now, and the Land image is no longer built here).
+Status: accepted, 2026-11-02 — by the project owner, who chose the repository split, the names `DinhDu002/lr` and `DinhDu002/linked-realms`, keeping the Shell's wallet part as LR's web wallet, the connect-agent for the game, and the chain-only gate. The wallet's labels (decision 3) and decisions 5 and 6 were filled in by Claude under the owner's go-ahead for the split. On 2026-11-03 the owner confirmed decision 3 and approved PLAN.md section 2; decisions 5 and 6 await their review. It changes ADR 0015 (decision 6, the direction of the split, and step 2C's Done-when) and ADR 0016 (decision 4: the package name takes effect now, and the Land image is no longer built here).
 
 ADRs 0001–0005, 0007, 0008, 0010 and 0014 named in this file are Linked Realms' (the game's repository, [`docs/decisions/` at `pre-split`](https://github.com/DinhDu002/linked-realms/tree/pre-split/docs/decisions)).
 
