@@ -1,8 +1,8 @@
 # Running LR's services
 
-LR's company services are a seed node that every other Node dials first, the Public node whose RPC wallets read, and an archive that keeps every Block. They are one compose project, `deploy/compose.chain.yaml`, on one server behind its Caddy. The Checkpoint signer runs on the project owner's own machine, from `deploy/compose.signer.yaml`. Each service runs the `lr-node` image, which holds the binary and no key.
+LR's company services are a seed node that every other Node dials first, the Public node whose RPC wallets read, an archive that keeps every Block, and the web wallet's pages. They are one compose project, `deploy/compose.chain.yaml`, on one server behind its Caddy. The Checkpoint signer runs on the project owner's own machine, from `deploy/compose.signer.yaml`. The Nodes run the `lr-node` image, which holds the binary and no key; the wallet's image holds only its pages, and each user's key stays in their browser.
 
-Since 2026-11-02 they serve the test network (id 3): the seed `seed.linkedrealms.com:9444`, the Public node `https://rpc.linkedrealms.com` (CORS `*`) and the archive, with the Checkpoint signer on the project owner's machine. The main network comes after the chain-only test (`PLAN.md` section 6, P7).
+Since 2026-11-02 they serve the test network (id 3): the seed `seed.linkedrealms.com:9444`, the Public node `https://rpc.linkedrealms.com` (CORS `*`) and the archive, with the Checkpoint signer on the project owner's machine. Since 2026-11-03 the wallet is at `https://wallet.linkedrealms.com`. The main network comes after the chain-only test (`PLAN.md` section 6, P7).
 
 ## 1. The server
 
@@ -14,7 +14,7 @@ cp deploy/.env.example deploy/.env
 chmod 600 deploy/.env
 ```
 
-Fill in `deploy/.env` only to change the defaults of `LR_P2P_PORT` (9444) or `LR_NETWORK` (`test`).
+In `deploy/.env`, set `LR_RPC_URL` to the Public node's public address (section 2, step 2), which the wallet's pages call. Change `LR_P2P_PORT` (9444) or `LR_NETWORK` (`test`) only to leave their defaults.
 
 ## 2. The chain
 
@@ -36,11 +36,21 @@ Fill in `deploy/.env` only to change the defaults of `LR_P2P_PORT` (9444) or `LR
      -d '{"jsonrpc":"2.0","id":1,"method":"lr_getInfo"}'   # the tip, and latestCheckpoint
    ```
 
-   A wallet is built with that name and the network (`VITE_NODE_URL`, `VITE_NETWORK`) and calls only it.
+   The wallet (step 4) is built with that address, `LR_RPC_URL`, and the network, and calls only it.
 
    Recreating the Caddy container drops the join; run `docker network connect` again. If the subnet `172.31.0.0/24` is already used on the server, change it, the two addresses and `--rpc-proxy` in `deploy/compose.chain.yaml` together.
 
-The compose project is named `linked-realms-chain` and its `public` service's container `linked-realms-chain-public-1`. The live Caddy names them, so a rename needs the Caddy changed with it.
+4. Choose a name for the wallet, `wallet.example.org` here, give it DNS, and add it to the Caddy in front. The image sends its own headers, among them the CSP, which lets its pages call `LR_RPC_URL` and nothing else:
+
+   ```
+   wallet.example.org {
+   	reverse_proxy linked-realms-chain-wallet-1:80
+   }
+   ```
+
+   A new `LR_RPC_URL` or `LR_NETWORK` needs the image built again: `docker compose -f deploy/compose.chain.yaml up -d --build wallet`.
+
+The compose project is named `linked-realms-chain`, its `public` service's container `linked-realms-chain-public-1` and its `wallet` service's `linked-realms-chain-wallet-1`. The live Caddy names them, so a rename needs the Caddy changed with it.
 
 ## 3. The Checkpoint signer
 
