@@ -22,7 +22,7 @@
 
 ## 2. Invariant principles
 
-> **Draft of 2026-11-02 for the project owner's approval (ADR 0017).** Until they approve it, P1–P10 of 2026-10-30 apply to LR's parts (P1–P5, P7–P10 as approved on 2026-10-29, with P7 replaced on 2026-10-30 by ADR 0015). The numbers are kept so that references in code still resolve. P6 is replaced; the changes to the others are only wording, except P7 (it starts after the chain-only test) and P2 (it names the company's services and the signer's key).
+> **Approved by the project owner on 2026-11-03 (ADR 0017),** in place of P1–P10 of 2026-10-30 (P1–P5, P7–P10 as approved on 2026-10-29, with P7 replaced on 2026-10-30 by ADR 0015). The numbers are kept so that references in code still resolve. P6 is replaced; the changes to the others are only wording, except P7 (it starts after the chain-only test) and P2 (it names the company's services and the signer's key).
 
 Every design and every line of code must follow the principles below. If a request conflicts with them, **stop and ask**. Only the project owner may edit this section.
 
@@ -233,7 +233,7 @@ D1, D2, D4, D5 and D13–D15 were decisions of the game (the client, the Map ser
 | D12 | Signatures | ML-DSA-44 (FIPS 204) with a scheme id and key rotation (ADR 0006) | secp256k1 ECDSA | Confirmed 2026-10-29 |
 | D16 | The chain as a product | LR, its own product with Linked Realms as its first application; main network after the chain-only test (ADR 0015, ADR 0017) | Test network only until Phase 3; one repository | Replaced 2026-11-02: the repository split is the other way round (ADR 0017) |
 | D17 | The repository | LR alone in `DinhDu002/lr`; the game in `DinhDu002/linked-realms`, cut at the tag `pre-split`; the web wallet stays with LR (ADR 0017) | LR moves out (ADR 0015); one repository | Decided 2026-11-02 by the project owner |
-| D18 | The wallet's key labels | Salt `lr/ml-dsa-44/v1`, info `account/{index}` (ADR 0017) | The game's Character labels | Proposed 2026-11-02 by Claude under the project owner's go-ahead for the split; to confirm |
+| D18 | The wallet's key labels | Salt `lr/ml-dsa-44/v1`, info `account/{index}` (ADR 0017) | The game's Character labels | Decided 2026-11-03 by the project owner |
 
 Also decided: Node.js 26 LTS; the repository is public; all repository content is in English.
 
@@ -261,6 +261,8 @@ Also decided: Node.js 26 LTS; the repository is public; all repository content i
 ### Log
 
 <!-- Claude Code records the date and the completed work here, newest first. -->
+
+- 2026-11-03: The project owner approved the principles in section 2 (ADR 0017) and confirmed D18, the wallet's own key labels. Section 2, `CLAUDE.md`, `AGENTS.md` and ADR 0017's status say so.
 
 - 2026-11-02: Linked Realms' repository `DinhDu002/linked-realms` is public, cut from the tag `pre-split` with `git filter-repo`, and depends on `@dinhdu002/lr-core` 0.1.0 and `ghcr.io/dinhdu002/lr-node:0.1.0`. Its CI is green. Its image workflow cannot push `ghcr.io/dinhdu002/linked-realms-node` (`permission_denied: write_package`) because that package is still linked to this repository; the project owner grants the new repository write access in the package's "Manage Actions access" settings, then reruns the workflow.
 

@@ -10,7 +10,7 @@ LR: a Proof-of-Work chain that holds money and nothing else. Gold is mined like 
 
 ## Principles that must never be broken
 
-Summary; details in `PLAN.md` section 2. **This is a draft of 2026-11-02 for the project owner's approval (ADR 0017): until they approve it, P1–P10 of 2026-10-30 apply to LR's parts.**
+Summary; details in `PLAN.md` section 2, approved by the project owner on 2026-11-03 (ADR 0017).
 
 1. Gold is decided only by chain rules that every Node checks; no application or service can change the chain.
 2. No service holds a user's key. Keys stay in the user's wallet. The company's services hold no key; the Checkpoint signer's key is the project owner's, on their own machine.
