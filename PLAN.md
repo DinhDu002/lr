@@ -262,6 +262,8 @@ Also decided: Node.js 26 LTS; the repository is public; all repository content i
 
 <!-- Claude Code records the date and the completed work here, newest first. -->
 
+- 2026-11-03: LR's web wallet is hosted for the test network at `https://wallet.linkedrealms.com`, ahead of the chain-only test. `deploy/compose.chain.yaml` gained a `wallet` service built for `LR_RPC_URL`, behind the same Caddy as the Public node (carthings infra PR #128); `docs/runbooks/lr-services.md` says how. Checked on the live site: the CSP lets the pages call only `https://rpc.linkedrealms.com`, and a new account is created, unlocked and shows its balance read from the Public node.
+
 - 2026-11-03: The project owner approved the principles in section 2 (ADR 0017) and confirmed D18, the wallet's own key labels. Section 2, `CLAUDE.md`, `AGENTS.md` and ADR 0017's status say so.
 
 - 2026-11-02: Linked Realms' repository `DinhDu002/linked-realms` is public, cut from the tag `pre-split` with `git filter-repo`, and depends on `@dinhdu002/lr-core` 0.1.0 and `ghcr.io/dinhdu002/lr-node:0.1.0`. Its CI is green. Its image workflow cannot push `ghcr.io/dinhdu002/linked-realms-node` (`permission_denied: write_package`) because that package is still linked to this repository; the project owner grants the new repository write access in the package's "Manage Actions access" settings, then reruns the workflow.
